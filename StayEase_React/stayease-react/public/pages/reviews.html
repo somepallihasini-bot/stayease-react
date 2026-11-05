@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StayEase - Customer Reviews</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #333;
+}
+
+header {
+    background: #173b64;
+    color: white;
+    padding: 18px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+header h2 {
+    font-size: 25px;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+    margin-left: 18px;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 15px;
+}
+
+.page-title {
+    text-align: center;
+    color: #173b64;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.filter-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px #ddd;
+}
+
+select, input, textarea {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.summary {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px #ddd;
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.summary h2 {
+    color: #1769aa;
+    margin-bottom: 5px;
+}
+
+.stars {
+    color: #e5a000;
+    font-size: 19px;
+    letter-spacing: 2px;
+}
+
+.review-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px #ddd;
+}
+
+.review-top {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.review-card h3 {
+    color: #173b64;
+    margin-bottom: 7px;
+}
+
+.review-card p {
+    line-height: 1.6;
+    margin-top: 8px;
+}
+
+.review-date {
+    color: #888;
+    font-size: 13px;
+}
+
+.sample-label {
+    color: #777;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.form-box {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    margin-top: 30px;
+    box-shadow: 0 2px 8px #ddd;
+}
+
+.form-box h2 {
+    color: #173b64;
+    margin-bottom: 15px;
+}
+
+.form-box label {
+    display: block;
+    margin-top: 14px;
+    font-weight: bold;
+}
+
+button {
+    background: #1769aa;
+    color: white;
+    border: none;
+    padding: 13px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 18px;
+    font-size: 15px;
+}
+
+button:hover {
+    background: #104c7d;
+}
+
+.no-reviews {
+    background: white;
+    padding: 25px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+footer {
+    background: #173b64;
+    color: white;
+    text-align: center;
+    padding: 18px;
+    margin-top: 40px;
+}
+
+@media(max-width:600px) {
+    header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    header a {
+        margin: 5px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>StayEase</h2>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="hotels.html">Hotels</a>
+        <a href="my-bookings.html">My Bookings</a>
+        <a href="reviews.html">Reviews</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <h1 class="page-title">Customer Reviews</h1>
+
+    <p class="subtitle">
+        Read customer experiences and share your feedback.
+    </p>
+
+    <div class="filter-box">
+        <label><b>Select Hotel</b></label>
+
+        <select id="hotelFilter" onchange="displayReviews()">
+            <option value="All">All Hotels</option>
+        </select>
+    </div>
+
+    <div class="summary">
+
+        <div>
+            <h2 id="averageRating">0.0</h2>
+            <div class="stars">★★★★★</div>
+            <p>Average Rating</p>
+        </div>
+
+        <div>
+            <h2 id="totalReviews">0</h2>
+            <p>Total Reviews</p>
+        </div>
+
+        <div>
+            <h2 id="fiveStar">0</h2>
+            <p>5 Star Reviews</p>
+        </div>
+
+    </div>
+
+    <h2 style="color:#173b64;margin-bottom:15px;">
+        Hotel Reviews
+    </h2>
+
+    <div id="reviewsContainer"></div>
+
+    <div class="form-box">
+
+        <h2>Write a Review</h2>
+
+        <form id="reviewForm">
+
+            <label>Customer Name</label>
+            <input
+                type="text"
+                id="customerName"
+                placeholder="Enter your name"
+                required
+            >
+
+            <label>Select Hotel</label>
+            <select id="reviewHotel" required>
+                <option value="">Choose Hotel</option>
+            </select>
+
+            <label>Rating</label>
+            <select id="rating" required>
+                <option value="">Select Rating</option>
+                <option value="5">★★★★★ - Excellent</option>
+                <option value="4">★★★★ - Very Good</option>
+                <option value="3">★★★ - Good</option>
+                <option value="2">★★ - Average</option>
+                <option value="1">★ - Poor</option>
+            </select>
+
+            <label>Your Review</label>
+            <textarea
+                id="comment"
+                rows="4"
+                placeholder="Write your experience..."
+                required
+            ></textarea>
+
+            <button type="submit">Submit Review</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<footer>
+    <p>© 2026 StayEase. All Rights Reserved.</p>
+</footer>
+
+<script>
+
+// ALL 25 HOTELS
+
+const hotels = [
+    "Taj Grand Hotel",
+    "City Comfort Inn",
+    "Royal Hyderabad Stay",
+    "Pearl Budget Hotel",
+    "Grand Palace Hyderabad",
+
+    "Royal Palace",
+    "Budget Stay Bangalore",
+    "Garden View Hotel",
+    "Bangalore Comfort Suites",
+    "Luxury Crown Hotel",
+
+    "Sea View Resort",
+    "Goa Beach Stay",
+    "Palm Tree Resort",
+    "Sunset Paradise",
+    "Ocean Luxury Resort",
+
+    "Mumbai Heights",
+    "City Budget Hotel",
+    "Marine Drive Hotel",
+    "Dream City Suites",
+    "Grand Mumbai Palace",
+
+    "Delhi Grand",
+    "Delhi Comfort Stay",
+    "Capital View Hotel",
+    "Royal Delhi Suites",
+    "Imperial Luxury Hotel"
+];
+
+// SAMPLE CUSTOMER REVIEWS
+
+const sampleCustomers = [
+    {
+        name: "Rahul",
+        rating: 5,
+        comment: "Excellent hotel! Rooms were clean and service was very good."
+    },
+    {
+        name: "Priya",
+        rating: 4,
+        comment: "Very comfortable stay. Staff were friendly and helpful."
+    },
+    {
+        name: "Arjun",
+        rating: 5,
+        comment: "Amazing experience. Food and room facilities were excellent."
+    },
+    {
+        name: "Sneha",
+        rating: 4,
+        comment: "Nice location and peaceful atmosphere. Enjoyed my stay."
+    },
+    {
+        name: "Kiran",
+        rating: 5,
+        comment: "Clean rooms, good facilities and value for money."
+    },
+    {
+        name: "Ananya",
+        rating: 4,
+        comment: "Good service and comfortable rooms. Would recommend it."
+    },
+    {
+        name: "Vikram",
+        rating: 5,
+        comment: "Wonderful experience. Everything was well maintained."
+    }
+];
+
+// GET EXISTING REVIEWS
+
+function getReviews() {
+
+    return JSON.parse(
+        localStorage.getItem("hotelReviews")
+    ) || [];
+
+}
+
+// ADD 6 SAMPLE REVIEWS FOR EACH HOTEL
+
+function addSampleReviews() {
+
+    let reviews = getReviews();
+
+    hotels.forEach((hotel, hotelIndex) => {
+
+        const existingCount = reviews.filter(review =>
+            review.hotelName === hotel &&
+            review.isSample === true
+        ).length;
+
+        for (let i = existingCount; i < 6; i++) {
+
+            const customer = sampleCustomers[
+                (hotelIndex + i) % sampleCustomers.length
+            ];
+
+            reviews.push({
+
+                id: "SAMPLE-" + hotelIndex + "-" + i,
+
+                customerName: customer.name,
+
+                hotelName: hotel,
+
+                rating: customer.rating,
+
+                comment: customer.comment,
+
+                date: "2026-10-" + (20 + i),
+
+                isSample: true
+
+            });
+
+        }
+
+    });
+
+    localStorage.setItem(
+        "hotelReviews",
+        JSON.stringify(reviews)
+    );
+
+}
+
+// FILL HOTEL DROPDOWNS
+
+function loadHotels() {
+
+    const filter = document.getElementById("hotelFilter");
+    const reviewHotel = document.getElementById("reviewHotel");
+
+    hotels.forEach(hotel => {
+
+        const option1 = document.createElement("option");
+        option1.value = hotel;
+        option1.textContent = hotel;
+        filter.appendChild(option1);
+
+        const option2 = document.createElement("option");
+        option2.value = hotel;
+        option2.textContent = hotel;
+        reviewHotel.appendChild(option2);
+
+    });
+
+}
+
+// DISPLAY STAR RATING
+
+function getStars(rating) {
+
+    return "★".repeat(Number(rating)) +
+           "☆".repeat(5 - Number(rating));
+
+}
+
+// DISPLAY REVIEWS
+
+function displayReviews() {
+
+    const reviews = getReviews();
+
+    const selectedHotel =
+        document.getElementById("hotelFilter").value;
+
+    const filteredReviews = reviews.filter(review => {
+
+        return selectedHotel === "All" ||
+               review.hotelName === selectedHotel;
+
+    });
+
+    const container =
+        document.getElementById("reviewsContainer");
+
+    container.innerHTML = "";
+
+    if (filteredReviews.length === 0) {
+
+        container.innerHTML =
+            '<div class="no-reviews">No reviews available for this hotel.</div>';
+
+        document.getElementById("averageRating").innerText = "0.0";
+        document.getElementById("totalReviews").innerText = "0";
+        document.getElementById("fiveStar").innerText = "0";
+
+        return;
+
+    }
+
+    // Calculate average rating
+
+    const total = filteredReviews.reduce(
+        (sum, review) => sum + Number(review.rating),
+        0
+    );
+
+    const average = total / filteredReviews.length;
+
+    const fiveStarCount = filteredReviews.filter(
+        review => Number(review.rating) === 5
+    ).length;
+
+    document.getElementById("averageRating").innerText =
+        average.toFixed(1);
+
+    document.getElementById("totalReviews").innerText =
+        filteredReviews.length;
+
+    document.getElementById("fiveStar").innerText =
+        fiveStarCount;
+
+    // Display every review
+
+    filteredReviews.slice().reverse().forEach(review => {
+
+        const card = document.createElement("div");
+
+        card.className = "review-card";
+
+        const top = document.createElement("div");
+        top.className = "review-top";
+
+        const customer = document.createElement("div");
+
+        const name = document.createElement("h3");
+        name.textContent = review.customerName || "Customer";
+
+        const date = document.createElement("span");
+        date.className = "review-date";
+        date.textContent = review.date || "";
+
+        customer.appendChild(name);
+        customer.appendChild(date);
+
+        const rating = document.createElement("div");
+        rating.className = "stars";
+        rating.textContent = getStars(review.rating);
+
+        top.appendChild(customer);
+        top.appendChild(rating);
+
+        const hotel = document.createElement("p");
+        hotel.innerHTML = "<b>Hotel:</b> ";
+
+        const hotelName = document.createElement("span");
+        hotelName.textContent = review.hotelName || "";
+
+        hotel.appendChild(hotelName);
+
+        const comment = document.createElement("p");
+        comment.textContent = review.comment || "";
+
+        card.appendChild(top);
+        card.appendChild(hotel);
+        card.appendChild(comment);
+
+        if (review.isSample === true) {
+
+            const sample = document.createElement("div");
+            sample.className = "sample-label";
+            sample.textContent = "Sample review for project demonstration";
+
+            card.appendChild(sample);
+
+        }
+
+        container.appendChild(card);
+
+    });
+
+}
+
+// SUBMIT NEW REVIEW
+
+document.getElementById("reviewForm")
+.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const customerName =
+        document.getElementById("customerName").value.trim();
+
+    const hotelName =
+        document.getElementById("reviewHotel").value;
+
+    const rating =
+        Number(document.getElementById("rating").value);
+
+    const comment =
+        document.getElementById("comment").value.trim();
+
+    if (!customerName || !hotelName || !rating || !comment) {
+
+        alert("Please fill all fields.");
+
+        return;
+
+    }
+
+    let reviews = getReviews();
+
+    const newReview = {
+
+        id: "USER-" + Date.now(),
+
+        customerName: customerName,
+
+        hotelName: hotelName,
+
+        rating: rating,
+
+        comment: comment,
+
+        date: new Date().toISOString().split("T")[0],
+
+        isSample: false
+
+    };
+
+    reviews.push(newReview);
+
+    localStorage.setItem(
+        "hotelReviews",
+        JSON.stringify(reviews)
+    );
+
+    alert("Thank you! Your review has been submitted.");
+
+    document.getElementById("reviewForm").reset();
+
+    document.getElementById("hotelFilter").value = hotelName;
+
+    displayReviews();
+
+});
+
+// INITIALIZE PAGE
+
+addSampleReviews();
+
+loadHotels();
+
+displayReviews();
+
+</script>
+
+</body>
+</html>

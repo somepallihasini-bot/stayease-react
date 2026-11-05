@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compare Hotels - StayEase</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #222;
+}
+
+header {
+    background: #173b67;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.back {
+    color: white;
+    text-decoration: none;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+.hotel-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px;
+}
+
+.hotel-option {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px #ddd;
+    transition: 0.3s;
+}
+
+.hotel-option:hover {
+    transform: translateY(-4px);
+}
+
+.hotel-option img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.hotel-info {
+    padding: 15px;
+}
+
+.hotel-info label {
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 17px;
+}
+
+.hotel-info input {
+    margin-right: 8px;
+    transform: scale(1.2);
+}
+
+.hotel-info p {
+    margin: 10px 0;
+}
+
+button {
+    background: #173b67;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 15px;
+}
+
+button:hover {
+    background: #24568e;
+}
+
+#result {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    background: white;
+    min-width: 500px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 14px;
+    text-align: center;
+}
+
+th {
+    background: #173b67;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background: #f1f5f9;
+}
+
+.compare-image {
+    width: 130px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+@media(max-width: 600px) {
+    .container {
+        padding: 12px;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🏨 StayEase</h1>
+    <h2>Compare Hotels</h2>
+    <a class="back" href="/">← Back to Home</a>
+</header>
+
+<div class="container">
+
+    <h2>Select Hotels to Compare</h2>
+    <p>Select any 2 or 3 hotels.</p>
+
+    <div class="hotel-list" id="hotelList"></div>
+
+    <button onclick="compareHotels()">Compare Hotels</button>
+
+    <div id="result"></div>
+
+</div>
+
+<script>
+
+// Hotel Images
+const hotelImages = [
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600",
+    "https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=600",
+    "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=600",
+    "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600",
+    "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600",
+    "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=600"
+];
+
+// Default 26 Hotels
+const defaultHotels = [
+    { name: "Taj Grand Hotel", city: "Hyderabad", price: 4500, rating: 4.8 },
+    { name: "City Comfort Inn", city: "Hyderabad", price: 2500, rating: 4.2 },
+    { name: "Royal Palace", city: "Bangalore", price: 3500, rating: 4.5 },
+    { name: "Sea View Resort", city: "Goa", price: 6000, rating: 4.7 },
+    { name: "Mumbai Heights", city: "Mumbai", price: 5000, rating: 4.6 },
+    { name: "Delhi Grand", city: "Delhi", price: 4000, rating: 4.4 },
+    { name: "City Comfort Hotel", city: "Hyderabad", price: 3500, rating: 4.5 },
+    { name: "Royal Orchid", city: "Hyderabad", price: 5000, rating: 4.7 },
+    { name: "Green Park Hotel", city: "Hyderabad", price: 4000, rating: 4.6 },
+    { name: "Grand Palace", city: "Hyderabad", price: 3000, rating: 4.3 },
+    { name: "Garden View Hotel", city: "Bangalore", price: 4200, rating: 4.6 },
+    { name: "Urban Stay", city: "Bangalore", price: 2800, rating: 4.2 },
+    { name: "Elite Residency", city: "Bangalore", price: 5000, rating: 4.8 },
+    { name: "Tech Park Hotel", city: "Bangalore", price: 3200, rating: 4.4 },
+    { name: "Beach Paradise", city: "Goa", price: 5500, rating: 4.8 },
+    { name: "Palm Resort", city: "Goa", price: 4500, rating: 4.5 },
+    { name: "Sunset Stay", city: "Goa", price: 3800, rating: 4.4 },
+    { name: "Ocean Blue Hotel", city: "Goa", price: 4000, rating: 4.6 },
+    { name: "Bandra Grand", city: "Mumbai", price: 6500, rating: 4.8 },
+    { name: "Sea Breeze Hotel", city: "Mumbai", price: 5500, rating: 4.7 },
+    { name: "Royal Marine Hotel", city: "Mumbai", price: 7000, rating: 4.9 },
+    { name: "Lake View Residency", city: "Mumbai", price: 4200, rating: 4.5 },
+    { name: "Capital Residency", city: "Delhi", price: 3000, rating: 4.3 },
+    { name: "Airport Luxury Hotel", city: "Delhi", price: 6500, rating: 4.9 },
+    { name: "Dwarka Comfort Inn", city: "Delhi", price: 2800, rating: 4.2 },
+    { name: "Saket Royal Hotel", city: "Delhi", price: 4500, rating: 4.6 }
+];
+
+// Get hotels from Local Storage also
+function getHotels() {
+
+    let adminHotels = JSON.parse(localStorage.getItem("adminHotels")) || [];
+
+    let hotels = defaultHotels.map((hotel, index) => ({
+        ...hotel,
+        image: hotelImages[index % hotelImages.length]
+    }));
+
+    adminHotels.forEach(hotel => {
+
+        let exists = hotels.some(item =>
+            item.name.toLowerCase() === (hotel.name || "").toLowerCase()
+        );
+
+        if (!exists && hotel.name) {
+            hotels.push({
+                name: hotel.name,
+                city: hotel.city || hotel.location || "Not specified",
+                price: Number(hotel.price) || 0,
+                rating: Number(hotel.rating) || 0,
+                image: hotel.image || hotel.img || hotelImages[hotels.length % hotelImages.length]
+            });
+        }
+    });
+
+    return hotels;
+}
+
+const hotels = getHotels();
+
+// Display all hotels
+function displayHotels() {
+
+    let list = document.getElementById("hotelList");
+
+    list.innerHTML = hotels.map((hotel, index) => `
+
+        <div class="hotel-option">
+
+            <img
+                src="${hotel.image}"
+                alt="${hotel.name}"
+                onerror="this.src='${hotelImages[0]}'"
+            >
+
+            <div class="hotel-info">
+
+                <label>
+                    <input
+                        type="checkbox"
+                        name="hotel"
+                        value="${index}"
+                        onchange="checkSelection()"
+                    >
+                    ${hotel.name}
+                </label>
+
+                <p>📍 ${hotel.city}</p>
+                <p>💰 ₹${hotel.price} / night</p>
+                <p>⭐ ${hotel.rating}</p>
+
+            </div>
+        </div>
+
+    `).join("");
+}
+
+// Allow maximum 3 selections
+function checkSelection() {
+
+    let selected = document.querySelectorAll(
+        'input[name="hotel"]:checked'
+    );
+
+    if (selected.length > 3) {
+        alert("You can select maximum 3 hotels.");
+        selected[selected.length - 1].checked = false;
+    }
+}
+
+// Compare selected hotels
+function compareHotels() {
+
+    let selected = [...document.querySelectorAll(
+        'input[name="hotel"]:checked'
+    )];
+
+    if (selected.length < 2 || selected.length > 3) {
+        alert("Please select minimum 2 and maximum 3 hotels.");
+        return;
+    }
+
+    let chosenHotels = selected.map(item => hotels[Number(item.value)]);
+
+    let result = `
+        <h2>Hotel Comparison</h2>
+
+        <table>
+
+            <tr>
+                <th>Features</th>
+                ${chosenHotels.map(h => `<th>${h.name}</th>`).join("")}
+            </tr>
+
+            <tr>
+                <td>Hotel Image</td>
+                ${chosenHotels.map(h => `
+                    <td>
+                        <img class="compare-image"
+                        src="${h.image}"
+                        alt="${h.name}"
+                        onerror="this.src='${hotelImages[0]}'">
+                    </td>
+                `).join("")}
+            </tr>
+
+            <tr>
+                <td>Location</td>
+                ${chosenHotels.map(h => `<td>${h.city}</td>`).join("")}
+            </tr>
+
+            <tr>
+                <td>Price / Night</td>
+                ${chosenHotels.map(h => `<td>₹${h.price}</td>`).join("")}
+            </tr>
+
+            <tr>
+                <td>Rating</td>
+                ${chosenHotels.map(h => `<td>⭐ ${h.rating}</td>`).join("")}
+            </tr>
+
+        </table>
+    `;
+
+    document.getElementById("result").innerHTML = result;
+
+    document.getElementById("result").scrollIntoView({
+        behavior: "smooth"
+    });
+}
+
+displayHotels();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hotel Details - StayEase</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #333;
+}
+
+header {
+    background: #173b67;
+    color: white;
+    padding: 18px;
+    text-align: center;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+}
+
+.container {
+    max-width: 850px;
+    margin: 25px auto;
+    padding: 15px;
+}
+
+.card {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px #ddd;
+    margin-bottom: 20px;
+}
+
+.hotel-image {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+h2 {
+    color: #173b67;
+}
+
+label {
+    display: block;
+    margin-top: 16px;
+    font-weight: bold;
+}
+
+select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.price {
+    color: green;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 20px;
+    background: #173b67;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #24568e;
+}
+
+.error {
+    color: red;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>StayEase 🏨</h1>
+    <h2 style="color:white;">Hotel Details</h2>
+    <a href="hotels.html">← Back to Hotels</a>
+</header>
+
+<div class="container">
+
+    <div class="card">
+
+        <img id="hotelImage" class="hotel-image" alt="Hotel Image">
+
+        <h2 id="hotelName">Hotel Name</h2>
+
+        <p>📍 Location: <span id="hotelLocation"></span></p>
+
+        <p>📍 Area: <span id="hotelArea"></span></p>
+
+        <p class="price">
+            Hotel Price: ₹<span id="hotelPrice"></span> / night
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>🛏️ Select Your Room</h2>
+
+        <label>Room Type</label>
+
+        <select id="roomType">
+            <option value="">Select Room Type</option>
+            <option value="Standard">Standard Room</option>
+            <option value="Deluxe">Deluxe Room</option>
+            <option value="Executive">Executive Room</option>
+            <option value="Suite">Suite Room</option>
+        </select>
+
+
+        <label>Room Price</label>
+
+        <select id="roomPrice">
+            <option value="">Select Room Type First</option>
+        </select>
+
+
+        <label>Room Image</label>
+
+        <p id="roomDescription">
+            Select a room to see its details.
+        </p>
+
+        <img
+            id="roomImage"
+            class="hotel-image"
+            style="height:200px; display:none;"
+            alt="Room Image"
+        >
+
+        <p class="price">
+            Selected Room Price: ₹<span id="selectedPrice">0</span> / night
+        </p>
+
+        <p class="error" id="error"></p>
+
+        <button onclick="continueBooking()">
+            Continue to Booking
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+// HOTEL DETAILS
+
+let hotelName =
+    localStorage.getItem("hotelName") || "Hotel";
+
+let hotelLocation =
+    localStorage.getItem("hotelLocation") || "N/A";
+
+let hotelArea =
+    localStorage.getItem("hotelSubLocation") || "";
+
+let hotelPrice = Number(
+    localStorage.getItem("hotelPrice") || 0
+);
+
+let hotelImage =
+    localStorage.getItem("hotelImage") || "";
+
+
+// DISPLAY HOTEL
+
+document.getElementById("hotelName").innerText =
+    hotelName;
+
+document.getElementById("hotelLocation").innerText =
+    hotelLocation;
+
+document.getElementById("hotelArea").innerText =
+    hotelArea || "Not Available";
+
+document.getElementById("hotelPrice").innerText =
+    hotelPrice.toLocaleString("en-IN");
+
+
+let hotelImageElement =
+    document.getElementById("hotelImage");
+
+hotelImageElement.src = hotelImage ||
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1000";
+
+hotelImageElement.onerror = function() {
+    this.onerror = null;
+    this.src =
+        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1000";
+};
+
+
+// ROOM DETAILS
+
+const rooms = {
+
+    Standard: {
+        price: 1000,
+        description: "Comfortable room with basic facilities.",
+        image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800"
+    },
+
+    Deluxe: {
+        price: 1500,
+        description: "Spacious room with premium facilities.",
+        image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800"
+    },
+
+    Executive: {
+        price: 2000,
+        description: "Executive room with luxury facilities.",
+        image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800"
+    },
+
+    Suite: {
+        price: 3000,
+        description: "Luxury suite with separate living space.",
+        image: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800"
+    }
+
+};
+
+
+// ROOM TYPE CHANGE
+
+document.getElementById("roomType").addEventListener(
+    "change",
+    function() {
+
+        let selectedType = this.value;
+
+        let priceSelect =
+            document.getElementById("roomPrice");
+
+        let roomImage =
+            document.getElementById("roomImage");
+
+        let description =
+            document.getElementById("roomDescription");
+
+        let selectedPrice =
+            document.getElementById("selectedPrice");
+
+        priceSelect.innerHTML = "";
+
+        selectedPrice.innerText = "0";
+
+        roomImage.style.display = "none";
+
+        if (!selectedType) {
+
+            priceSelect.innerHTML =
+                '<option value="">Select Room Type First</option>';
+
+            description.innerText =
+                "Select a room to see its details.";
+
+            return;
+
+        }
+
+        let room = rooms[selectedType];
+
+        let option = document.createElement("option");
+
+        option.value = room.price;
+
+        option.textContent =
+            "₹" + room.price.toLocaleString("en-IN") +
+            " per night";
+
+        priceSelect.appendChild(option);
+
+        selectedPrice.innerText =
+            room.price.toLocaleString("en-IN");
+
+        description.innerText = room.description;
+
+        roomImage.src = room.image;
+
+        roomImage.style.display = "block";
+
+        localStorage.setItem("roomType", selectedType);
+
+        localStorage.setItem("roomPrice", room.price);
+
+        localStorage.setItem("selectedRoomImage", room.image);
+
+    }
+);
+
+
+// CONTINUE BOOKING
+
+function continueBooking() {
+
+    let error =
+        document.getElementById("error");
+
+    error.innerText = "";
+
+    let selectedType =
+        document.getElementById("roomType").value;
+
+    let selectedRoomPrice =
+        Number(document.getElementById("roomPrice").value);
+
+
+    if (hotelPrice <= 0) {
+
+        error.innerText =
+            "Hotel price not available. Please select the hotel again.";
+
+        return;
+
+    }
+
+    if (!selectedType || selectedRoomPrice <= 0) {
+
+        error.innerText =
+            "Please select a room type.";
+
+        return;
+
+    }
+
+
+    // SAVE HOTEL AND ROOM DETAILS
+
+    localStorage.setItem("hotelName", hotelName);
+
+    localStorage.setItem("hotelPrice", hotelPrice);
+
+    localStorage.setItem("hotelLocation", hotelLocation);
+
+    localStorage.setItem("hotelSubLocation", hotelArea);
+
+    localStorage.setItem("hotelImage", hotelImage);
+
+    localStorage.setItem("roomType", selectedType);
+
+    localStorage.setItem("roomPrice", selectedRoomPrice);
+
+
+    // GO TO BOOKING PAGE
+
+    window.location.href = "booking.html";
+
+}
+
+</script>
+
+</body>
+</html>

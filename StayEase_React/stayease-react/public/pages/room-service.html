@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Room Service - StayEase</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f7fc;
+    color: #172b4d;
+}
+
+header {
+    background: linear-gradient(120deg, #092b55, #174b83);
+    color: white;
+    padding: 22px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 30px;
+}
+
+header p {
+    margin: 7px 0 0;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin: 8px;
+    font-weight: bold;
+}
+
+.booking-bar {
+    margin: 20px 3%;
+    padding: 18px;
+    background: #e2edfc;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.booking-bar strong {
+    color: #123d70;
+}
+
+.container {
+    padding: 0 3% 30px;
+}
+
+.category {
+    margin-bottom: 28px;
+}
+
+.category-title {
+    padding: 13px 18px;
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 13px;
+    font-size: 22px;
+}
+
+.starters-title {
+    background: linear-gradient(90deg, #102f5e, #245b91);
+}
+
+.veg-title {
+    background: linear-gradient(90deg, #087438, #159b51);
+}
+
+.nonveg-title {
+    background: linear-gradient(90deg, #8b1024, #bd263c);
+}
+
+.drinks-title {
+    background: linear-gradient(90deg, #54208a, #8139b8);
+}
+
+.food-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+}
+
+.food-card {
+    background: white;
+    border: 1px solid #dce5f1;
+    border-radius: 13px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+    transition: 0.2s;
+}
+
+.food-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+.food-card img {
+    width: 100%;
+    height: 155px;
+    object-fit: cover;
+    display: block;
+    background: #edf1f6;
+}
+
+.food-info {
+    padding: 12px;
+}
+
+.food-info h3 {
+    margin: 0 0 8px;
+    font-size: 17px;
+}
+
+.price {
+    color: #13803b;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.quantity-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.quantity-row button {
+    border: none;
+    background: #e5edf8;
+    color: #173b67;
+    border-radius: 7px;
+    padding: 7px 12px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.quantity-row button:hover {
+    background: #c9dcf5;
+}
+
+.quantity {
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+}
+
+.order-panel {
+    background: white;
+    border-radius: 13px;
+    padding: 20px;
+    margin: 25px 0;
+    box-shadow: 0 3px 12px #dce3ee;
+}
+
+.order-panel h2 {
+    margin-top: 0;
+    color: #173b67;
+}
+
+.order-total {
+    font-size: 27px;
+    color: #13803b;
+    font-weight: bold;
+}
+
+.primary-btn {
+    background: #123d70;
+    color: white;
+    border: none;
+    border-radius: 9px;
+    padding: 15px;
+    width: 100%;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.primary-btn:hover {
+    background: #245b91;
+}
+
+.secondary-btn {
+    background: #e8eef7;
+    color: #173b67;
+    border: none;
+    padding: 9px 13px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.order-history {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 25px;
+    box-shadow: 0 3px 12px #dce3ee;
+}
+
+.order-card {
+    border: 1px solid #dce5f1;
+    border-radius: 9px;
+    padding: 14px;
+    margin: 12px 0;
+}
+
+.status {
+    display: inline-block;
+    background: #fff0c7;
+    color: #8a5b00;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.empty {
+    color: #777;
+    text-align: center;
+    padding: 20px;
+}
+
+.note {
+    color: #64748b;
+    font-size: 14px;
+}
+
+@media(max-width:600px) {
+    header {
+        padding: 18px;
+    }
+
+    header h1 {
+        font-size: 24px;
+    }
+
+    nav a {
+        display: inline-block;
+        margin: 5px;
+    }
+
+    .food-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .food-card img {
+        height: 120px;
+    }
+
+    .food-info {
+        padding: 9px;
+    }
+
+    .food-info h3 {
+        font-size: 14px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div>
+        <h1>🏨 StayEase</h1>
+        <p>Room Service - Delicious Food Delivered To Your Room</p>
+    </div>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="my-bookings.html">My Bookings</a>
+        <a href="profile.html">Profile</a>
+    </nav>
+</header>
+
+<div class="booking-bar">
+    <div>
+        🛏️ <strong>Your Booking:</strong>
+        <span id="bookingHotel">Select your booking</span>
+    </div>
+
+    <div>
+        📅 <strong>Check-in:</strong>
+        <span id="checkIn">-</span>
+    </div>
+
+    <div>
+        📅 <strong>Check-out:</strong>
+        <span id="checkOut">-</span>
+    </div>
+
+    <div>
+        🟢 <strong id="availability">Room Service</strong>
+    </div>
+</div>
+
+<div class="container">
+
+    <h2>🍽️ Our Food Menu</h2>
+    <p class="note">Choose your favourite food. We deliver directly to your room.</p>
+
+    <!-- STARTERS -->
+
+    <section class="category">
+        <h2 class="category-title starters-title">⭐ Starters & Snacks</h2>
+        <div class="food-grid" id="startersMenu"></div>
+    </section>
+
+    <!-- VEG MEALS -->
+
+    <section class="category">
+        <h2 class="category-title veg-title">🥗 Veg Meals</h2>
+        <div class="food-grid" id="vegMenu"></div>
+    </section>
+
+    <!-- NON VEG MEALS -->
+
+    <section class="category">
+        <h2 class="category-title nonveg-title">🍗 Non-Veg Meals</h2>
+        <div class="food-grid" id="nonVegMenu"></div>
+    </section>
+
+    <!-- DRINKS -->
+
+    <section class="category">
+        <h2 class="category-title drinks-title">🥤 Juices & Drinks</h2>
+        <div class="food-grid" id="drinksMenu"></div>
+    </section>
+
+    <!-- ORDER SUMMARY -->
+
+    <div class="order-panel">
+        <h2>🛒 Your Order Summary</h2>
+
+        <div id="selectedItems">
+            No items selected.
+        </div>
+
+        <hr>
+
+        <p>Delivery: <strong>Room Service Only</strong></p>
+
+        <p class="order-total">
+            Total Amount: ₹<span id="totalAmount">0</span>
+        </p>
+
+        <button class="primary-btn" onclick="placeOrder()">
+            🛎️ Place Food Order
+        </button>
+
+        <p class="note">
+            Food will be delivered to your booked room.
+        </p>
+    </div>
+
+    <!-- ORDER HISTORY -->
+
+    <div class="order-history">
+        <h2>📋 My Food Orders</h2>
+        <div id="orderHistory"></div>
+    </div>
+
+</div>
+
+<script>
+
+// FOOD MENU
+
+const menu = [
+
+    // STARTERS & SNACKS
+    {
+        id: 1,
+        category: "starters",
+        name: "Veg Manchuria",
+        price: 120,
+        image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=600"
+    },
+    {
+        id: 2,
+        category: "starters",
+        name: "Paneer Tikka",
+        price: 180,
+        image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=600"
+    },
+    {
+        id: 3,
+        category: "starters",
+        name: "Samosa",
+        price: 60,
+        image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600"
+    },
+    {
+        id: 4,
+        category: "starters",
+        name: "French Fries",
+        price: 100,
+        image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600"
+    },
+    {
+        id: 5,
+        category: "starters",
+        name: "Gobi 65",
+        price: 140,
+        image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=600"
+    },
+
+    // VEG MEALS
+    {
+        id: 6,
+        category: "veg",
+        name: "Veg Thali",
+        price: 200,
+        image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600"
+    },
+    {
+        id: 7,
+        category: "veg",
+        name: "South Indian Meals",
+        price: 180,
+        image: "https://images.unsplash.com/photo-1630383249896-424e482df921?w=600"
+    },
+    {
+        id: 8,
+        category: "veg",
+        name: "North Indian Thali",
+        price: 220,
+        image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600"
+    },
+    {
+        id: 9,
+        category: "veg",
+        name: "Veg Fried Rice",
+        price: 160,
+        image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600"
+    },
+
+    // NON VEG MEALS
+    {
+        id: 10,
+        category: "nonveg",
+        name: "Chicken Meals",
+        price: 250,
+        image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=600"
+    },
+    {
+        id: 11,
+        category: "nonveg",
+        name: "Chicken Biryani",
+        price: 280,
+        image: "https://images.unsplash.com/photo-1563379091339-03246963d96c?w=600"
+    },
+    {
+        id: 12,
+        category: "nonveg",
+        name: "Mutton Biryani",
+        price: 350,
+        image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=600"
+    },
+    {
+        id: 13,
+        category: "nonveg",
+        name: "Fish Meals",
+        price: 260,
+        image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600"
+    },
+    {
+        id: 14,
+        category: "nonveg",
+        name: "Chicken Fried Rice",
+        price: 240,
+        image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600"
+    },
+
+    // JUICES & DRINKS
+    {
+        id: 15,
+        category: "drinks",
+        name: "Orange Juice",
+        price: 80,
+        image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=600"
+    },
+    {
+        id: 16,
+        category: "drinks",
+        name: "Mango Juice",
+        price: 90,
+        image: "https://images.unsplash.com/photo-1546173159-315724a31696?w=600"
+    },
+    {
+        id: 17,
+        category: "drinks",
+        name: "Watermelon Juice",
+        price: 80,
+        image: "https://images.unsplash.com/photo-1525385133512-2f3bdd039054?w=600"
+    },
+    {
+        id: 18,
+        category: "drinks",
+        name: "Coke",
+        price: 50,
+        image: "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=600"
+    },
+    {
+        id: 19,
+        category: "drinks",
+        name: "Sprite",
+        price: 50,
+        image: "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=600"
+    },
+    {
+        id: 20,
+        category: "drinks",
+        name: "Thums Up",
+        price: 50,
+        image: "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?w=600"
+    },
+    {
+        id: 21,
+        category: "drinks",
+        name: "Water Bottle",
+        price: 20,
+        image: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600"
+    }
+];
+
+let quantities = {};
+
+let selectedBooking = null;
+
+
+// SHOW FOOD MENU
+
+function showMenu() {
+
+    const categories = {
+        starters: "startersMenu",
+        veg: "vegMenu",
+        nonveg: "nonVegMenu",
+        drinks: "drinksMenu"
+    };
+
+    Object.keys(categories).forEach(category => {
+
+        const container = document.getElementById(categories[category]);
+
+        const items = menu.filter(item =>
+            item.category === category
+        );
+
+        container.innerHTML = items.map(item => `
+
+            <div class="food-card">
+
+                <img
+                    src="${item.image}"
+                    alt="${item.name}"
+                    loading="lazy"
+                    onerror="this.onerror=null;this.src='https://placehold.co/500x300?text=Food+Image';"
+                >
+
+                <div class="food-info">
+
+                    <h3>${item.name}</h3>
+
+                    <div class="price">₹${item.price}</div>
+
+                    <div class="quantity-row">
+
+                        <button onclick="changeQuantity(${item.id}, -1)">
+                            −
+                        </button>
+
+                        <span class="quantity" id="qty-${item.id}">0</span>
+
+                        <button onclick="changeQuantity(${item.id}, 1)">
+                            +
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `).join("");
+
+    });
+
+}
+
+
+// CHANGE QUANTITY
+
+function changeQuantity(id, change) {
+
+    let current = quantities[id] || 0;
+
+    current = Math.max(0, current + change);
+
+    quantities[id] = current;
+
+    document.getElementById("qty-" + id).innerText = current;
+
+    updateTotal();
+}
+
+
+// CALCULATE TOTAL
+
+function updateTotal() {
+
+    let total = 0;
+    let selected = [];
+
+    menu.forEach(item => {
+
+        let qty = quantities[item.id] || 0;
+
+        if (qty > 0) {
+
+            let amount = qty * item.price;
+
+            total += amount;
+
+            selected.push(`
+                <p>
+                    ${item.name} × ${qty}
+                    <strong style="float:right">₹${amount}</strong>
+                </p>
+            `);
+        }
+
+    });
+
+    document.getElementById("totalAmount").innerText = total;
+
+    document.getElementById("selectedItems").innerHTML =
+        selected.length ? selected.join("") : "No items selected.";
+
+}
+
+
+// GET CURRENT USER
+
+function getCurrentUser() {
+
+    try {
+
+        return JSON.parse(localStorage.getItem("currentUser")) || {};
+
+    } catch (error) {
+
+        return {};
+
+    }
+
+}
+
+
+// FIND USER BOOKINGS
+
+function getMyBookings() {
+
+    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+    let user = getCurrentUser();
+
+    let email = user.email || user.userEmail || localStorage.getItem("userEmail") || "";
+
+    let userId = user.userId || user.id || "";
+
+    let userName = user.name || user.userName || localStorage.getItem("userName") || "";
+
+    return bookings.filter(booking => {
+
+        let sameUser =
+            (email && booking.userEmail === email) ||
+            (userId && booking.userId === userId) ||
+            (userName && booking.userName === userName) ||
+            (userName && booking.customerName === userName);
+
+        let status = booking.bookingStatus || booking.status || "Confirmed";
+
+        return sameUser && status !== "Cancelled";
+
+    });
+
+}
+
+
+// SELECT ACTIVE BOOKING
+
+function loadBooking() {
+
+    let bookings = getMyBookings();
+
+    let today = new Date();
+    today.setHours(0,0,0,0);
+
+    selectedBooking = bookings.find(booking => {
+
+        let checkIn = new Date(booking.checkIn);
+        let checkOut = new Date(booking.checkOut);
+
+        return !isNaN(checkIn) &&
+               !isNaN(checkOut) &&
+               today >= checkIn &&
+               today < checkOut;
+
+    });
+
+    if (!selectedBooking) {
+
+        document.getElementById("bookingHotel").innerText =
+            "No active check-in booking";
+
+        document.getElementById("checkIn").innerText = "-";
+
+        document.getElementById("checkOut").innerText = "-";
+
+        document.getElementById("availability").innerText =
+            "Check-in required";
+
+        document.getElementById("availability").style.color = "red";
+
+        return;
+
+    }
+
+    document.getElementById("bookingHotel").innerText =
+        (selectedBooking.hotelName || "Hotel") +
+        " - Room " + (selectedBooking.roomNumber || "N/A");
+
+    document.getElementById("checkIn").innerText =
+        selectedBooking.checkIn || "-";
+
+    document.getElementById("checkOut").innerText =
+        selectedBooking.checkOut || "-";
+
+    document.getElementById("availability").innerText =
+        "Room Service Available";
+
+    document.getElementById("availability").style.color = "green";
+
+}
+
+
+// PLACE FOOD ORDER
+
+function placeOrder() {
+
+    if (!selectedBooking) {
+
+        alert("Food ordering is available after hotel check-in. Please check your active booking.");
+
+        return;
+
+    }
+
+    let foodItems = [];
+
+    menu.forEach(item => {
+
+        let qty = quantities[item.id] || 0;
+
+        if (qty > 0) {
+
+            foodItems.push({
+
+                name: item.name,
+
+                price: item.price,
+
+                quantity: qty,
+
+                total: item.price * qty
+
+            });
+
+        }
+
+    });
+
+    if (foodItems.length === 0) {
+
+        alert("Please select at least one food item.");
+
+        return;
+
+    }
+
+    let foodTotal = foodItems.reduce(
+        (sum, item) => sum + item.total, 0
+    );
+
+    let user = getCurrentUser();
+
+    let foodOrders = JSON.parse(
+        localStorage.getItem("foodOrders")
+    ) || [];
+
+    let newOrder = {
+
+        orderId: "FOOD" + Date.now(),
+
+        bookingId: selectedBooking.bookingId || "",
+
+        userId: user.userId || user.id || "",
+
+        userEmail: user.email || user.userEmail ||
+                   localStorage.getItem("userEmail") || "",
+
+        customerName: selectedBooking.customerName ||
+                      selectedBooking.userName ||
+                      user.name ||
+                      user.userName ||
+                      localStorage.getItem("userName") || "",
+
+        contactNumber: selectedBooking.contactNumber ||
+                       selectedBooking.phone || "",
+
+        hotelName: selectedBooking.hotelName || "",
+
+        roomNumber: selectedBooking.roomNumber || "",
+
+        roomType: selectedBooking.roomType || "",
+
+        foodItems: foodItems,
+
+        foodTotal: foodTotal,
+
+        deliveryType: "Room Service",
+
+        orderTiming: "After Check-in",
+
+        orderStatus: "Pending",
+
+        createdAt: new Date().toLocaleString()
+
+    };
+
+    foodOrders.push(newOrder);
+
+    localStorage.setItem(
+        "foodOrders",
+        JSON.stringify(foodOrders)
+    );
+
+    alert(
+        "Food Order Placed Successfully!\n" +
+        "Order ID: " + newOrder.orderId +
+        "\nTotal: ₹" + foodTotal
+    );
+
+    quantities = {};
+
+    showMenu();
+
+    updateTotal();
+
+    showOrderHistory();
+
+}
+
+
+// SHOW ORDER HISTORY
+
+function showOrderHistory() {
+
+    let orders = JSON.parse(
+        localStorage.getItem("foodOrders")
+    ) || [];
+
+    let user = getCurrentUser();
+
+    let email = user.email || user.userEmail ||
+                localStorage.getItem("userEmail") || "";
+
+    let userId = user.userId || user.id || "";
+
+    let userName = user.name || user.userName ||
+                   localStorage.getItem("userName") || "";
+
+    let myOrders = orders.filter(order => {
+
+        return (
+            (email && order.userEmail === email) ||
+            (userId && order.userId === userId) ||
+            (userName && order.customerName === userName)
+        );
+
+    });
+
+    let history = document.getElementById("orderHistory");
+
+    if (myOrders.length === 0) {
+
+        history.innerHTML =
+            '<p class="empty">No food orders yet.</p>';
+
+        return;
+
+    }
+
+    history.innerHTML = myOrders.slice().reverse().map(order => {
+
+        let items = (order.foodItems || []).map(item => {
+
+            return `<li>${item.name} × ${item.quantity} - ₹${item.total}</li>`;
+
+        }).join("");
+
+        return `
+
+            <div class="order-card">
+
+                <h3>Order ID: ${order.orderId}</h3>
+
+                <p><strong>Hotel:</strong> ${order.hotelName || "N/A"}</p>
+
+                <p><strong>Room:</strong> ${order.roomNumber || "N/A"}</p>
+
+                <p><strong>Items:</strong></p>
+
+                <ul>${items}</ul>
+
+                <p><strong>Total:</strong> ₹${order.foodTotal}</p>
+
+                <p><strong>Delivery:</strong> Room Service</p>
+
+                <p><strong>Date:</strong> ${order.createdAt || "N/A"}</p>
+
+                <span class="status">
+                    ${order.orderStatus || "Pending"}
+                </span>
+
+            </div>
+
+        `;
+
+    }).join("");
+
+}
+
+
+// INITIALIZE PAGE
+
+showMenu();
+
+loadBooking();
+
+updateTotal();
+
+showOrderHistory();
+
+</script>
+
+</body>
+</html>

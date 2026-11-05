@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Bookings - StayEase</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #333;
+}
+
+header {
+    background: #173b67;
+    color: white;
+    padding: 18px;
+    text-align: center;
+}
+
+.container {
+    max-width: 950px;
+    margin: 30px auto;
+    padding: 15px;
+}
+
+.booking-card {
+    background: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px #ddd;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.booking-card img {
+    width: 230px;
+    height: 190px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.details {
+    flex: 1;
+    min-width: 230px;
+    line-height: 1.7;
+}
+
+.details p {
+    margin: 6px 0;
+    overflow-wrap: anywhere;
+}
+
+.status {
+    color: green;
+    font-weight: bold;
+}
+
+.cancelled {
+    color: red;
+    font-weight: bold;
+}
+
+.amount {
+    color: #198754;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.customer {
+    background: #eef5ff;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+
+.food-box {
+    background: #fff8ed;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+
+.food-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    border-bottom: 1px solid #ddd;
+    padding: 5px 0;
+}
+
+.price-box {
+    background: #f3f7fc;
+    padding: 12px;
+    border-radius: 8px;
+    margin: 12px 0;
+}
+
+button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #173b67;
+    color: white;
+    cursor: pointer;
+    margin: 5px 5px 5px 0;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+.cancel-btn {
+    background: #dc3545;
+}
+
+.home-btn {
+    background: #198754;
+    margin-top: 15px;
+}
+
+.empty {
+    background: white;
+    padding: 40px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+@media(max-width:600px) {
+    .booking-card img {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>StayEase 🏨</h1>
+    <p>My Bookings</p>
+</header>
+
+<div class="container">
+
+    <h2>My Hotel Bookings</h2>
+
+    <div id="bookingList"></div>
+
+    <button class="home-btn"
+        onclick="window.location.href='/'">
+        Back to Home
+    </button>
+
+</div>
+
+
+<script>
+
+// GET LOGGED-IN USER
+
+let currentUser = null;
+
+try {
+
+    currentUser = JSON.parse(
+        localStorage.getItem("currentUser") || "null"
+    );
+
+} catch (error) {
+
+    currentUser = null;
+
+}
+
+
+const userName =
+    currentUser?.name ||
+    localStorage.getItem("userName") ||
+    "";
+
+const userEmail =
+    currentUser?.email ||
+    localStorage.getItem("userEmail") ||
+    "";
+
+const userId =
+    currentUser?.id ||
+    currentUser?.userId ||
+    currentUser?.email ||
+    userEmail ||
+    userName;
+
+
+// GET ALL BOOKINGS
+
+function getAllBookings() {
+
+    try {
+
+        const bookings = JSON.parse(
+            localStorage.getItem("bookings") || "[]"
+        );
+
+        return Array.isArray(bookings) ? bookings : [];
+
+    } catch (error) {
+
+        return [];
+
+    }
+
+}
+
+
+let allBookings = getAllBookings();
+
+
+// CURRENCY FORMAT
+
+function money(value) {
+
+    return Number(value || 0).toLocaleString("en-IN", {
+        maximumFractionDigits: 2
+    });
+
+}
+
+
+// SAFE HTML
+
+function safe(value) {
+
+    return String(value ?? "N/A").replace(/[&<>"']/g, function(char) {
+
+        return {
+
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+
+        }[char];
+
+    });
+
+}
+
+
+// GET CURRENT USER BOOKINGS
+
+function getMyBookings() {
+
+    if (!userId && !userEmail && !userName) {
+
+        return [];
+
+    }
+
+    return allBookings
+
+        .map((booking, index) => ({
+
+            booking: booking,
+            originalIndex: index
+
+        }))
+
+        .filter(item => {
+
+            const b = item.booking;
+
+            const bookingUserId =
+                String(b.userId || b.user?.id || "");
+
+            const bookingEmail =
+                String(b.userEmail || b.email || "")
+                .toLowerCase();
+
+            const bookingName =
+                String(b.userName || b.customerName || "")
+                .toLowerCase();
+
+            return (
+
+                (userId &&
+                    bookingUserId === String(userId)) ||
+
+                (userEmail &&
+                    bookingEmail === userEmail.toLowerCase()) ||
+
+                (userName &&
+                    bookingName === userName.toLowerCase())
+
+            );
+
+        });
+
+}
+
+
+// GET FOOD ITEMS
+
+function getFoodItems(booking) {
+
+    return Array.isArray(booking.foodItems)
+        ? booking.foodItems
+        : [];
+
+}
+
+
+// GET FOOD TOTAL
+
+function getFoodTotal(booking) {
+
+    const items = getFoodItems(booking);
+
+    return items.reduce((sum, item) => {
+
+        const total = Number(
+            item.total ??
+            (
+                Number(item.price || 0) *
+                Number(item.quantity || 0)
+            )
+        );
+
+        return sum + total;
+
+    }, 0);
+
+}
+
+
+// DISPLAY BOOKINGS
+
+function displayBookings() {
+
+    const bookingList =
+        document.getElementById("bookingList");
+
+    bookingList.innerHTML = "";
+
+    allBookings = getAllBookings();
+
+    const myBookings = getMyBookings();
+
+
+    if (myBookings.length === 0) {
+
+        bookingList.innerHTML = `
+
+            <div class="empty">
+
+                <h2>No Bookings Found!</h2>
+
+                <p>You have not booked any hotels yet.</p>
+
+                <button onclick="window.location.href='hotels.html'">
+                    Book a Hotel
+                </button>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    myBookings.slice().reverse().forEach(item => {
+
+        const booking = item.booking;
+
+        const originalIndex = item.originalIndex;
+
+
+        const status =
+            booking.bookingStatus ||
+            booking.status ||
+            "Confirmed";
+
+
+        const isCancelled =
+            String(status).toLowerCase() === "cancelled";
+
+
+        const image = booking.hotelImage ||
+            "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800";
+
+
+        const checkIn =
+            booking.checkIn ||
+            booking.checkin ||
+            "N/A";
+
+        const checkOut =
+            booking.checkOut ||
+            booking.checkout ||
+            "N/A";
+
+
+        const location =
+            (booking.location || booking.hotelLocation || "N/A") +
+
+            (
+                booking.subLocation ||
+                booking.hotelSubLocation
+                    ? ", " + (
+                        booking.subLocation ||
+                        booking.hotelSubLocation
+                    )
+                    : ""
+            );
+
+
+        const customerName =
+            booking.customerName ||
+            booking.userName ||
+            "N/A";
+
+
+        const contactNumber =
+            booking.contactNumber ||
+            "N/A";
+
+
+        // FOOD DETAILS
+
+        const foodItems = getFoodItems(booking);
+
+        const foodTotal = Number(
+            booking.foodTotal ?? getFoodTotal(booking)
+        );
+
+
+        let foodHTML = "";
+
+        if (foodItems.length > 0) {
+
+            foodHTML = foodItems.map(food => {
+
+                const quantity =
+                    Number(food.quantity || 0);
+
+                const itemTotal = Number(
+                    food.total ??
+                    (
+                        Number(food.price || 0) *
+                        quantity
+                    )
+                );
+
+                return `
+
+                    <div class="food-item">
+
+                        <span>
+                            ${safe(food.name)}
+                            × ${quantity}
+                        </span>
+
+                        <strong>
+                            ₹${money(itemTotal)}
+                        </strong>
+
+                    </div>
+
+                `;
+
+            }).join("");
+
+        } else {
+
+            foodHTML =
+                "<p>No food items selected.</p>";
+
+        }
+
+
+        // PRICE DETAILS
+
+        const hotelAmount = Number(
+            booking.hotelAmount ??
+            booking.hotelTotal ??
+            (
+                Number(booking.hotelPrice || 0) *
+                Number(booking.nights || 1)
+            )
+        );
+
+        const roomAmount = Number(
+            booking.roomAmount ??
+            booking.roomTotal ??
+            (
+                Number(booking.roomPrice || 0) *
+                Number(booking.nights || 1)
+            )
+        );
+
+        const subtotal = Number(
+            booking.subtotal ??
+            (hotelAmount + roomAmount + foodTotal)
+        );
+
+        const discount = Number(
+            booking.couponDiscount ??
+            booking.discount ??
+            booking.discountAmount ??
+            0
+        );
+
+        const total = Number(
+            booking.finalAmount ??
+            booking.totalAmount ??
+            booking.total ??
+            Math.max(0, subtotal - discount)
+        );
+
+
+        const card = document.createElement("div");
+
+        card.className = "booking-card";
+
+
+        card.innerHTML = `
+
+            <img
+                src="${safe(image)}"
+                alt="Hotel Image"
+                onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800'">
+
+
+            <div class="details">
+
+                <h2>${safe(booking.hotelName || "Hotel")}</h2>
+
+                <p>
+                    <b>Booking ID:</b>
+                    ${safe(booking.bookingId || "N/A")}
+                </p>
+
+
+                <div class="customer">
+
+                    <h3>Customer Details</h3>
+
+                    <p>
+                        <b>Customer Name:</b>
+                        ${safe(customerName)}
+                    </p>
+
+                    <p>
+                        <b>Contact Number:</b>
+                        ${safe(contactNumber)}
+                    </p>
+
+                </div>
+
+
+                <p>
+                    <b>Location:</b>
+                    ${safe(location)}
+                </p>
+
+                <p>
+                    <b>Room Type:</b>
+                    ${safe(booking.roomType || "N/A")}
+                </p>
+
+                <p>
+                    <b>Room Number:</b>
+                    ${safe(booking.roomNumber || "N/A")}
+                </p>
+
+                <p>
+                    <b>Check-in:</b>
+                    ${safe(checkIn)}
+                </p>
+
+                <p>
+                    <b>Check-out:</b>
+                    ${safe(checkOut)}
+                </p>
+
+                <p>
+                    <b>Nights:</b>
+                    ${safe(booking.nights || "N/A")}
+                </p>
+
+                <p>
+                    <b>Guests:</b>
+                    ${safe(booking.guests || 1)}
+                </p>
+
+
+                <!-- FOOD DETAILS -->
+
+                <div class="food-box">
+
+                    <h3>🍽️ Food Order Details</h3>
+
+                    ${foodHTML}
+
+                    <p>
+                        <b>Food Total:</b>
+                        ₹${money(foodTotal)}
+                    </p>
+
+                    <p>
+                        <b>Delivery:</b>
+                        ${safe(booking.foodDelivery ||
+                            (foodItems.length ? "Room Service" : "Not Ordered"))}
+                    </p>
+
+                    <p>
+                        <b>Order Timing:</b>
+                        ${safe(booking.foodOrderTiming ||
+                            (foodItems.length ? "At Booking" : "Not Ordered"))}
+                    </p>
+
+                </div>
+
+
+                <!-- PRICE DETAILS -->
+
+                <div class="price-box">
+
+                    <h3>💰 Price Details</h3>
+
+                    <p>
+                        Hotel Amount:
+                        ₹${money(hotelAmount)}
+                    </p>
+
+                    <p>
+                        Room Amount:
+                        ₹${money(roomAmount)}
+                    </p>
+
+                    <p>
+                        Food Amount:
+                        ₹${money(foodTotal)}
+                    </p>
+
+                    <p>
+                        Subtotal:
+                        ₹${money(subtotal)}
+                    </p>
+
+                    <p>
+                        Discount:
+                        ₹${money(discount)}
+                    </p>
+
+                </div>
+
+
+                <p>
+                    <b>Payment Method:</b>
+                    ${safe(booking.paymentMethod || "N/A")}
+                </p>
+
+                <p>
+                    <b>Payment Status:</b>
+                    ${safe(booking.paymentStatus || "N/A")}
+                </p>
+
+
+                <p>
+                    <b>Status:</b>
+
+                    <span class="${isCancelled ? "cancelled" : "status"}">
+
+                        ${safe(status)}
+
+                    </span>
+
+                </p>
+
+
+                <p class="amount">
+
+                    Total: ₹${money(total)}
+
+                </p>
+
+
+                <button onclick="viewBooking(${originalIndex})">
+
+                    View Details
+
+                </button>
+
+
+                ${
+                    !isCancelled
+                    ? `
+                        <button
+                            class="cancel-btn"
+                            onclick="cancelBooking(${originalIndex})">
+
+                            Cancel Booking
+
+                        </button>
+                    `
+                    : ""
+                }
+
+            </div>
+
+        `;
+
+
+        bookingList.appendChild(card);
+
+    });
+
+}
+
+
+// VIEW BOOKING
+
+function viewBooking(index) {
+
+    const booking = allBookings[index];
+
+    if (!booking) return;
+
+
+    localStorage.setItem(
+        "latestBooking",
+        JSON.stringify(booking)
+    );
+
+
+    localStorage.setItem(
+        "bookingId",
+        booking.bookingId || ""
+    );
+
+
+    window.location.href = "confirmation.html";
+
+}
+
+
+// CANCEL BOOKING
+
+function cancelBooking(index) {
+
+    const booking = allBookings[index];
+
+    if (!booking) return;
+
+
+    const confirmCancel = confirm(
+        "Are you sure you want to cancel this booking?"
+    );
+
+    if (!confirmCancel) return;
+
+
+    // UPDATE BOOKING STATUS
+
+    booking.status = "Cancelled";
+
+    booking.bookingStatus = "Cancelled";
+
+    booking.cancelledAt = new Date().toISOString();
+
+
+    // UPDATE RELATED FOOD ORDER
+
+    try {
+
+        const foodOrders = JSON.parse(
+            localStorage.getItem("foodOrders") || "[]"
+        );
+
+        foodOrders.forEach(order => {
+
+            if (
+                order.bookingId === booking.bookingId &&
+                order.orderTiming === "At Booking"
+            ) {
+
+                order.orderStatus = "Cancelled";
+
+                order.cancelledAt =
+                    new Date().toISOString();
+
+            }
+
+        });
+
+        localStorage.setItem(
+            "foodOrders",
+            JSON.stringify(foodOrders)
+        );
+
+    } catch (error) {
+
+        console.error("Food order update error:", error);
+
+    }
+
+
+    // SAVE BOOKINGS
+
+    localStorage.setItem(
+        "bookings",
+        JSON.stringify(allBookings)
+    );
+
+
+    displayBookings();
+
+    alert("Booking cancelled successfully!");
+
+}
+
+
+// INITIAL DISPLAY
+
+displayBookings();
+
+</script>
+
+</body>
+</html>

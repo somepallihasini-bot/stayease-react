@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Bookings - StayEase Admin</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            padding: 25px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 25px;
+            color: #222;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #ddd;
+        }
+
+        .stat-card h3 {
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .stat-card h2 {
+            color: #2563eb;
+            font-size: 28px;
+        }
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px #ddd;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        th, td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+        }
+
+        tr:hover {
+            background: #f5f7ff;
+        }
+
+        .status {
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .confirmed {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .cancelled {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 11px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .print-btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        .refresh-btn {
+            background: #16a34a;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 25px;
+            color: #777;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 12px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .buttons {
+                display: none;
+            }
+
+            .table-container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Manage Bookings</h1>
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <h3>Total Bookings</h3>
+            <h2 id="totalBookings">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>Confirmed Bookings</h3>
+            <h2 id="confirmedBookings">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>Total Revenue</h3>
+            <h2 id="totalRevenue">₹0</h2>
+        </div>
+
+    </div>
+
+    <div class="buttons">
+        <button class="print-btn" onclick="window.print()">
+            Print Bookings
+        </button>
+
+        <button class="refresh-btn" onclick="loadBookings()">
+            Refresh
+        </button>
+    </div>
+
+    <div class="table-container">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Customer</th>
+                    <th>Hotel</th>
+                    <th>Room Number</th>
+                    <th>Room Type</th>
+                    <th>Check-in</th>
+                    <th>Check-out</th>
+                    <th>Guests</th>
+                    <th>Amount</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody id="bookingTable">
+                <tr>
+                    <td colspan="11" class="empty">
+                        Loading bookings...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+    // Admin login check
+    if (localStorage.getItem("adminLogin") !== "true") {
+        window.location.href = "/admin/login";
+    }
+
+    function loadBookings() {
+
+        // Get bookings from localStorage
+        let bookings = JSON.parse(
+            localStorage.getItem("bookings") || "[]"
+        );
+
+        let total = bookings.length;
+
+        let confirmed = bookings.filter(function(booking) {
+            return (booking.bookingStatus || "Confirmed") === "Confirmed";
+        }).length;
+
+        // Revenue calculation includes all bookings,
+        // matching the existing dashboard's total amount.
+        let revenue = bookings.reduce(function(sum, booking) {
+            return sum + Number(booking.totalAmount || 0);
+        }, 0);
+
+        document.getElementById("totalBookings").innerText = total;
+
+        document.getElementById("confirmedBookings").innerText = confirmed;
+
+        document.getElementById("totalRevenue").innerText =
+            "₹" + revenue.toLocaleString("en-IN");
+
+        let table = document.getElementById("bookingTable");
+
+        table.innerHTML = "";
+
+        if (bookings.length === 0) {
+            table.innerHTML = `
+                <tr>
+                    <td colspan="11" class="empty">
+                        No bookings available
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        bookings.forEach(function(booking) {
+
+            let status = booking.bookingStatus || "Confirmed";
+
+            let statusClass =
+                status === "Cancelled" ? "cancelled" : "confirmed";
+
+            let bookingId = booking.bookingId || "N/A";
+            let customer = booking.customerName ||
+                localStorage.getItem("userName") || "Customer";
+
+            let hotel = booking.hotelName || "N/A";
+            let roomNumber = booking.roomNumber || "N/A";
+            let roomType = booking.roomType || "N/A";
+            let checkIn = booking.checkIn || "N/A";
+            let checkOut = booking.checkOut || "N/A";
+            let guests = booking.guests || 1;
+            let amount = Number(booking.totalAmount || 0);
+
+            let payment = booking.paymentStatus ||
+                "Demo Payment Successful";
+
+            let row = document.createElement("tr");
+
+            let values = [
+                bookingId,
+                customer,
+                hotel,
+                roomNumber,
+                roomType,
+                checkIn,
+                checkOut,
+                guests,
+                "₹" + amount.toLocaleString("en-IN"),
+                payment
+            ];
+
+            values.forEach(function(value) {
+                let cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            let statusCell = document.createElement("td");
+            let statusSpan = document.createElement("span");
+
+            statusSpan.className = "status " + statusClass;
+            statusSpan.textContent = status;
+
+            statusCell.appendChild(statusSpan);
+            row.appendChild(statusCell);
+
+            table.appendChild(row);
+
+        });
+    }
+
+    // Load bookings when page opens
+    loadBookings();
+
+</script>
+
+</body>
+</html>

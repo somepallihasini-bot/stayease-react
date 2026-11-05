@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StayEase - Hotel Location</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #222;
+        }
+
+        header {
+            background: #142d4e;
+            color: white;
+            padding: 20px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            color: #ffcc66;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .hotel-card, .map-card, .nearby-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            box-shadow: 0 3px 12px #ddd;
+        }
+
+        h2 {
+            margin-bottom: 15px;
+        }
+
+        .hotel-info {
+            line-height: 1.8;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        input {
+            flex: 1;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        button {
+            padding: 13px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #1748b5;
+        }
+
+        iframe {
+            width: 100%;
+            height: 420px;
+            border: 0;
+            border-radius: 10px;
+        }
+
+        .nearby-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .place {
+            padding: 18px;
+            background: #f1f5f9;
+            border-radius: 8px;
+        }
+
+        .place a {
+            display: inline-block;
+            margin-top: 10px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .directions {
+            background: #16a34a;
+            margin-top: 15px;
+        }
+
+        .directions:hover {
+            background: #15803d;
+        }
+
+        #message {
+            margin: 12px 0;
+            color: #dc2626;
+        }
+
+        @media(max-width: 600px) {
+            header {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .nearby-grid {
+                grid-template-columns: 1fr;
+            }
+
+            iframe {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>StayEase</h2>
+    <a href="/">← Back to Home</a>
+</header>
+
+<div class="container">
+
+    <div class="hotel-card">
+        <h2>📍 Hotel Details</h2>
+
+        <div class="hotel-info">
+            <p><b>Hotel Name:</b> <span id="hotelName"></span></p>
+            <p><b>Location:</b> <span id="hotelLocation"></span></p>
+        </div>
+    </div>
+
+    <div class="map-card">
+
+        <h2>Google Maps Location</h2>
+
+        <p>Enter hotel address or city to view its map.</p>
+
+        <div class="search-box">
+            <input
+                type="text"
+                id="locationInput"
+                placeholder="Enter hotel address or city"
+            >
+
+            <button onclick="showMap()">Search</button>
+        </div>
+
+        <p id="message"></p>
+
+        <div id="mapContainer"></div>
+
+        <button class="directions" onclick="getDirections()">
+            Get Directions
+        </button>
+
+    </div>
+
+    <div class="nearby-card">
+
+        <h2>Nearby Places</h2>
+
+        <div class="nearby-grid">
+
+            <div class="place">
+                <h3>🏥 Hospitals</h3>
+                <p>Find hospitals near the hotel.</p>
+                <a href="#" onclick="searchNearby('hospitals'); return false;">
+                    Find Hospitals
+                </a>
+            </div>
+
+            <div class="place">
+                <h3>🍽️ Restaurants</h3>
+                <p>Find restaurants near the hotel.</p>
+                <a href="#" onclick="searchNearby('restaurants'); return false;">
+                    Find Restaurants
+                </a>
+            </div>
+
+            <div class="place">
+                <h3>🛍️ Shopping</h3>
+                <p>Find shopping malls near the hotel.</p>
+                <a href="#" onclick="searchNearby('shopping malls'); return false;">
+                    Find Shopping Malls
+                </a>
+            </div>
+
+            <div class="place">
+                <h3>✈️ Airport</h3>
+                <p>Find airports near the hotel.</p>
+                <a href="#" onclick="searchNearby('airports'); return false;">
+                    Find Airports
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    let hotelName = localStorage.getItem("hotelName") ||
+                    "StayEase Hotel";
+
+    let hotelLocation =
+        localStorage.getItem("hotelSubLocation") ||
+        localStorage.getItem("hotelLocation") ||
+        "Hyderabad";
+
+    let currentLocation = "";
+
+    document.getElementById("hotelName").innerText = hotelName;
+
+    document.getElementById("hotelLocation").innerText =
+        hotelLocation;
+
+    document.getElementById("locationInput").value =
+        hotelLocation;
+
+    function showMap() {
+
+        let location =
+            document.getElementById("locationInput").value.trim();
+
+        let message = document.getElementById("message");
+
+        if (location === "") {
+            message.innerText = "Please enter a hotel location.";
+            return;
+        }
+
+        currentLocation = location;
+
+        message.innerText = "";
+
+        let mapURL =
+            "https://maps.google.com/maps?q=" +
+            encodeURIComponent(location) +
+            "&output=embed";
+
+        document.getElementById("mapContainer").innerHTML = `
+            <iframe
+                src="${mapURL}"
+                loading="lazy"
+                allowfullscreen>
+            </iframe>
+        `;
+    }
+
+    function getDirections() {
+
+        if (currentLocation === "") {
+            showMap();
+        }
+
+        if (currentLocation === "") return;
+
+        let directionURL =
+            "https://www.google.com/maps/dir/?api=1&destination=" +
+            encodeURIComponent(currentLocation);
+
+        window.open(directionURL, "_blank");
+    }
+
+    function searchNearby(place) {
+
+        if (currentLocation === "") {
+            currentLocation =
+                document.getElementById("locationInput").value.trim();
+        }
+
+        if (currentLocation === "") {
+            alert("Please enter hotel location first.");
+            return;
+        }
+
+        let searchURL =
+            "https://www.google.com/maps/search/" +
+            encodeURIComponent(place + " near " + currentLocation);
+
+        window.open(searchURL, "_blank");
+    }
+
+    // Load map automatically
+    showMap();
+
+</script>
+
+</body>
+</html>

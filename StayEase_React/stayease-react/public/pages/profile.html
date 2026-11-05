@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - StayEase</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        header {
+            background: #173b57;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        header h2 {
+            font-size: 25px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        nav a:hover {
+            color: #ffd166;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 35px auto;
+        }
+
+        h1 {
+            color: #173b57;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        .profile-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .avatar {
+            width: 90px;
+            height: 90px;
+            background: #173b57;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+            margin: 0 auto 18px;
+        }
+
+        .profile-card h2 {
+            color: #173b57;
+            margin-bottom: 8px;
+        }
+
+        .email {
+            color: #777;
+            margin-bottom: 15px;
+        }
+
+        .active {
+            display: inline-block;
+            background: #d8f5df;
+            color: #16843a;
+            padding: 7px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-top: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 22px;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #ddd;
+        }
+
+        .stat-card h3 {
+            color: #173b57;
+            font-size: 27px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .actions {
+            background: white;
+            padding: 25px;
+            margin-top: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #ddd;
+        }
+
+        .actions h2 {
+            color: #173b57;
+            margin-bottom: 18px;
+        }
+
+        .actions a {
+            display: inline-block;
+            background: #173b57;
+            color: white;
+            text-decoration: none;
+            padding: 11px 18px;
+            border-radius: 5px;
+            margin: 5px;
+        }
+
+        .actions a:hover {
+            background: #245879;
+        }
+
+        .logout {
+            background: #c0392b !important;
+        }
+
+        footer {
+            background: #173b57;
+            color: white;
+            text-align: center;
+            padding: 18px;
+            margin-top: 40px;
+        }
+
+        @media(max-width: 600px) {
+            header {
+                flex-direction: column;
+            }
+
+            nav a {
+                display: inline-block;
+                margin: 7px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>StayEase</h2>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="hotels.html">Hotels</a>
+        <a href="my-bookings.html">My Bookings</a>
+        <a href="/wishlist">Wishlist</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <h1>My Profile</h1>
+    <p class="subtitle">Manage your StayEase account.</p>
+
+    <div class="profile-card">
+
+        <div class="avatar" id="avatar">U</div>
+
+        <h2 id="userName">Guest User</h2>
+
+        <p class="email" id="userEmail">No email available</p>
+
+        <span class="active">Active User</span>
+
+    </div>
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <h3 id="totalBookings">0</h3>
+            <p>Total Bookings</p>
+        </div>
+
+        <div class="stat-card">
+            <h3 id="totalWishlist">0</h3>
+            <p>Wishlist Items</p>
+        </div>
+
+        <div class="stat-card">
+            <h3 id="totalReviews">0</h3>
+            <p>Reviews Given</p>
+        </div>
+
+    </div>
+
+    <div class="actions">
+
+        <h2>Account Options</h2>
+
+        <a href="my-bookings.html">My Bookings</a>
+
+        <a href="/wishlist">My Wishlist</a>
+
+        <a href="reviews.html">Write a Review</a>
+
+        <a href="/">Explore Hotels</a>
+
+        <a href="#" class="logout" onclick="logoutUser(); return false;">
+            Logout
+        </a>
+
+    </div>
+
+</div>
+
+<footer>
+    <p>© 2026 StayEase - Smart Hotel Booking Platform</p>
+</footer>
+
+<script>
+
+    function loadProfile() {
+
+        let name = localStorage.getItem("userName") || "Guest User";
+        let email = localStorage.getItem("userEmail") || "No email available";
+
+        let bookings = JSON.parse(
+            localStorage.getItem("bookings")
+        ) || [];
+
+        let wishlist = JSON.parse(
+            localStorage.getItem("wishlist")
+        ) || [];
+
+        let reviews = JSON.parse(
+            localStorage.getItem("hotelReviews")
+        ) || [];
+
+        // Display user details
+        document.getElementById("userName").textContent = name;
+
+        document.getElementById("userEmail").textContent = email;
+
+        // First letter of name
+        document.getElementById("avatar").textContent =
+            name.charAt(0).toUpperCase();
+
+        // Display counts
+        document.getElementById("totalBookings").textContent =
+            bookings.length;
+
+        document.getElementById("totalWishlist").textContent =
+            wishlist.length;
+
+        // Count reviews submitted by this user
+        let myReviews = reviews.filter(function(review) {
+            return email !== "No email available" &&
+                review.customerEmail === email;
+        });
+
+        document.getElementById("totalReviews").textContent =
+            myReviews.length;
+    }
+
+    function logoutUser() {
+
+        if (confirm("Are you sure you want to logout?")) {
+
+            localStorage.removeItem("userName");
+            localStorage.removeItem("userEmail");
+
+            alert("Logged out successfully!");
+
+            window.location.href = "/";
+        }
+    }
+
+    loadProfile();
+
+</script>
+
+</body>
+</html>

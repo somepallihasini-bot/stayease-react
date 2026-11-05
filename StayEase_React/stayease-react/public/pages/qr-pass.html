@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR Booking Pass - StayEase</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f1f4f8;
+}
+
+header {
+    background: #173b67;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+}
+
+.container {
+    max-width: 600px;
+    margin: 35px auto;
+    padding: 20px;
+}
+
+.pass {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 3px 12px #ccc;
+}
+
+.pass h2 {
+    color: #173b67;
+}
+
+.details {
+    text-align: left;
+    margin-top: 20px;
+    line-height: 1.8;
+}
+
+.qr {
+    margin: 20px auto;
+}
+
+button {
+    background: #173b67;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 8px;
+}
+
+button:hover {
+    background: #24568e;
+}
+
+@media print {
+    header, .buttons {
+        display: none;
+    }
+
+    body {
+        background: white;
+    }
+
+    .pass {
+        box-shadow: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>StayEase 🏨</h1>
+    <a href="/">← Back to Home</a>
+</header>
+
+<div class="container">
+
+    <div class="pass" id="bookingPass">
+
+        <h2>🎫 Booking Pass</h2>
+        <h3>StayEase Hotel Reservation</h3>
+
+        <div class="details" id="details"></div>
+
+        <div class="qr">
+            <div id="qrcode"></div>
+        </div>
+
+        <p><b>Scan QR Code for Booking Details</b></p>
+        <p>Thank you for choosing StayEase!</p>
+
+    </div>
+
+    <div class="buttons" style="text-align:center;">
+        <button onclick="window.print()">Download / Print Pass</button>
+        <button onclick="window.location.href='my-bookings.html'">
+            My Bookings
+        </button>
+    </div>
+
+</div>
+
+<!-- QR Code Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+
+let bookingId = localStorage.getItem("bookingId");
+
+let bookings = JSON.parse(
+    localStorage.getItem("bookings")
+) || [];
+
+let booking = bookings.find(
+    item => item.bookingId === bookingId
+);
+
+if (!booking) {
+    document.getElementById("bookingPass").innerHTML =
+        "<h2>Booking Not Found</h2><p>Please complete a booking first.</p>";
+} else {
+
+    document.getElementById("details").innerHTML = `
+        <p><b>Booking ID:</b> ${booking.bookingId}</p>
+        <p><b>Hotel:</b> ${booking.hotelName || "N/A"}</p>
+        <p><b>Location:</b> ${booking.location || "N/A"}</p>
+        <p><b>Room Number:</b> ${booking.roomNumber || "N/A"}</p>
+        <p><b>Room Type:</b> ${booking.roomType || "N/A"}</p>
+        <p><b>Check-in:</b> ${booking.checkIn || "N/A"}</p>
+        <p><b>Check-out:</b> ${booking.checkOut || "N/A"}</p>
+        <p><b>Guests:</b> ${booking.guests || 1}</p>
+        <p><b>Amount:</b> ₹${Number(booking.totalAmount || 0).toFixed(2)}</p>
+        <p><b>Status:</b> ${booking.status || "Confirmed"}</p>
+    `;
+
+    let qrData = JSON.stringify({
+        bookingId: booking.bookingId,
+        hotel: booking.hotelName,
+        room: booking.roomNumber,
+        checkIn: booking.checkIn,
+        checkOut: booking.checkOut,
+        status: booking.status
+    });
+
+    if (typeof QRCode !== "undefined") {
+        new QRCode(document.getElementById("qrcode"), {
+            text: qrData,
+            width: 180,
+            height: 180
+        });
+    } else {
+        document.getElementById("qrcode").innerText =
+            "QR library could not load. Please check your internet connection.";
+    }
+
+}
+
+</script>
+
+</body>
+</html>

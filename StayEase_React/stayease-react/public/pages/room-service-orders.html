@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StayEase - Room Service</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f7fb;
+    color: #222;
+}
+
+header {
+    background: #12385b;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+}
+
+.room-details {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px #ddd;
+}
+
+.hotel-image {
+    width: 220px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.section {
+    margin-bottom: 30px;
+}
+
+.section h2 {
+    background: #12385b;
+    color: white;
+    padding: 13px;
+    border-radius: 8px;
+}
+
+.menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 18px;
+}
+
+.food {
+    background: white;
+    padding: 12px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px #ddd;
+}
+
+.food img {
+    width: 100%;
+    height: 145px;
+    object-fit: cover;
+    border-radius: 9px;
+}
+
+.food h3 {
+    margin: 10px 0;
+    min-height: 38px;
+}
+
+.price {
+    color: green;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.quantity {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 12px;
+}
+
+.quantity button {
+    background: #12385b;
+    color: white;
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 6px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.quantity span {
+    font-weight: bold;
+    min-width: 15px;
+}
+
+.summary {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px #ddd;
+    margin-top: 25px;
+}
+
+.summary h2 {
+    color: #12385b;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.summary-item img {
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+    border-radius: 7px;
+}
+
+.summary-item button {
+    margin-left: auto;
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 7px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.total {
+    text-align: right;
+    font-size: 24px;
+    font-weight: bold;
+    color: green;
+}
+
+.order-btn {
+    width: 100%;
+    padding: 15px;
+    background: #159447;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.nav-buttons button {
+    flex: 1;
+    background: #12385b;
+    color: white;
+    padding: 13px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.note {
+    background: #e5f0ff;
+    padding: 18px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+#message {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 12px;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #12385b;
+}
+
+@media(max-width:600px) {
+    .room-details {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .hotel-image {
+        width: 100%;
+    }
+
+    .nav-buttons {
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>StayEase - Room Service</h1>
+    <p>Order Your Favourite Food</p>
+</header>
+
+<div class="container">
+
+    <!-- ROOM DETAILS -->
+
+    <div class="room-details">
+
+        <img id="hotelImage"
+             class="hotel-image"
+             src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500"
+             alt="Hotel">
+
+        <div>
+            <h2>Room Details</h2>
+            <p id="hotelName">Hotel: Loading...</p>
+            <p id="roomNumber">Room: Loading...</p>
+            <p id="bookingId">Booking ID: Loading...</p>
+        </div>
+
+    </div>
+
+    <!-- BREAKFAST -->
+
+    <div class="section">
+        <h2>☕ Breakfast</h2>
+        <div class="menu" id="breakfast"></div>
+    </div>
+
+    <!-- LUNCH -->
+
+    <div class="section">
+        <h2>🍛 Lunch</h2>
+        <div class="menu" id="lunch"></div>
+    </div>
+
+    <!-- DINNER -->
+
+    <div class="section">
+        <h2>🌙 Dinner</h2>
+        <div class="menu" id="dinner"></div>
+    </div>
+
+    <!-- SNACKS -->
+
+    <div class="section">
+        <h2>🍔 Snacks</h2>
+        <div class="menu" id="snacks"></div>
+    </div>
+
+    <!-- ORDER SUMMARY -->
+
+    <div class="summary">
+
+        <h2>🛒 Order Summary</h2>
+
+        <div id="cart">
+            No items selected.
+        </div>
+
+        <h2 class="total">
+            Total: ₹<span id="total">0</span>
+        </h2>
+
+        <button class="order-btn" onclick="placeOrder()">
+            🍴 Place Food Order
+        </button>
+
+        <p id="message"></p>
+
+    </div>
+
+    <div class="note">
+        <h3>Note:</h3>
+        <p>✔ Hotel Buffet meals are included in your booking.</p>
+        <p>✔ Room Service food orders have separate charges.</p>
+    </div>
+
+    <div class="nav-buttons">
+        <button onclick="location.href='my-bookings.html'">
+            My Bookings
+        </button>
+
+        <button onclick="location.href='room-service-orders.html'">
+            My Food Orders
+        </button>
+    </div>
+
+</div>
+
+<footer>
+    StayEase | Premium Hospitality Experience
+</footer>
+
+<script>
+
+// BOOKING DETAILS
+
+const booking =
+    JSON.parse(localStorage.getItem("latestBooking")) ||
+    JSON.parse(localStorage.getItem("bookingDetails")) ||
+    {};
+
+document.getElementById("hotelName").innerText =
+    "Hotel: " + (booking.hotelName || localStorage.getItem("hotelName") || "StayEase Hotel");
+
+document.getElementById("roomNumber").innerText =
+    "Room: " + (booking.roomNumber || "Not specified");
+
+document.getElementById("bookingId").innerText =
+    "Booking ID: " + (booking.bookingId || localStorage.getItem("bookingId") || "Not available");
+
+document.getElementById("hotelImage").src =
+    booking.hotelImage || localStorage.getItem("hotelImage") ||
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500";
+
+
+// FOOD MENU
+
+const menu = {
+
+    breakfast: [
+        {
+            name: "Idli",
+            price: 40,
+            image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=400"
+        },
+        {
+            name: "Dosa",
+            price: 60,
+            image: "https://images.unsplash.com/photo-1668236543090-82eba5ee5976?w=400"
+        },
+        {
+            name: "Poori",
+            price: 50,
+            image: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=400"
+        },
+        {
+            name: "Upma",
+            price: 45,
+            image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400"
+        }
+    ],
+
+    lunch: [
+        {
+            name: "Veg Thali",
+            price: 180,
+            image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400"
+        },
+        {
+            name: "Non-Veg Thali",
+            price: 220,
+            image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400"
+        },
+        {
+            name: "Veg Biryani",
+            price: 150,
+            image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400"
+        },
+        {
+            name: "Paneer Biryani",
+            price: 170,
+            image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400"
+        },
+        {
+    name: "Chicken Biryani",
+    price: 200,
+    image: "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=400"
+},
+        {
+    name: "Mutton Biryani",
+    price: 250,
+    image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400"
+},
+        {
+            name: "Plain Rice",
+            price: 50,
+            image: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=400"
+        },
+        {
+            name: "Dal Fry",
+            price: 100,
+            image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400"
+        },
+        {
+            name: "Sambar",
+            price: 80,
+            image: "https://images.unsplash.com/photo-1547592180-85f173990554?w=400"
+        },
+        {
+            name: "Paneer Butter Masala",
+            price: 160,
+            image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400"
+        },
+        {
+            name: "Chicken Curry",
+            price: 180,
+            image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400"
+        },
+        {
+            name: "Mutton Curry",
+            price: 220,
+            image: "https://images.unsplash.com/photo-1545247181-516773cae754?w=400"
+        },
+        {
+            name: "Chapati",
+            price: 40,
+            image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400"
+        }
+    ],
+
+    dinner: [
+        {
+            name: "Fried Rice",
+            price: 120,
+            image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400"
+        },
+        {
+            name: "Paneer Butter Masala",
+            price: 160,
+            image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400"
+        },
+        {
+            name: "Chicken Curry",
+            price: 180,
+            image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400"
+        },
+        {
+            name: "Mutton Curry",
+            price: 220,
+            image: "https://images.unsplash.com/photo-1545247181-516773cae754?w=400"
+        },
+        {
+            name: "Roti",
+            price: 35,
+            image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400"
+        },
+        {
+            name: "Rice",
+            price: 50,
+            image: "https://images.unsplash.com/photo-1516684732162-798a0062be99?w=400"
+        }
+    ],
+
+    snacks: [
+        {
+            name: "Samosa",
+            price: 30,
+            image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=400"
+        },
+        {
+            name: "Sandwich",
+            price: 70,
+            image: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400"
+        },
+        {
+            name: "French Fries",
+            price: 80,
+            image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400"
+        },
+        {
+            name: "Tea",
+            price: 20,
+            image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=400"
+        }
+    ]
+
+};
+
+
+// CART
+
+let cart = {};
+
+
+// DISPLAY FOOD MENU
+
+function displayMenu() {
+
+    Object.keys(menu).forEach(category => {
+
+        const container = document.getElementById(category);
+
+        menu[category].forEach((item, index) => {
+
+            const id = category + "-" + index;
+
+            const card = document.createElement("div");
+            card.className = "food";
+
+            const image = document.createElement("img");
+            image.src = item.image;
+            image.alt = item.name;
+            image.loading = "lazy";
+
+            image.onerror = function() {
+                this.src = "https://placehold.co/400x250?text=Food+Image";
+            };
+
+            const name = document.createElement("h3");
+            name.innerText = item.name;
+
+            const price = document.createElement("p");
+            price.className = "price";
+            price.innerText = "₹" + item.price;
+
+            const quantity = document.createElement("div");
+            quantity.className = "quantity";
+
+            const minus = document.createElement("button");
+            minus.innerText = "-";
+            minus.onclick = () => changeQty(id, -1);
+
+            const count = document.createElement("span");
+            count.id = "qty-" + id;
+            count.innerText = "0";
+
+            const plus = document.createElement("button");
+            plus.innerText = "+";
+            plus.onclick = () => changeQty(id, 1);
+
+            quantity.append(minus, count, plus);
+
+            card.append(image, name, price, quantity);
+            container.appendChild(card);
+
+        });
+
+    });
+
+}
+
+
+// CHANGE QUANTITY
+
+function changeQty(id, change) {
+
+    cart[id] = (cart[id] || 0) + change;
+
+    if (cart[id] <= 0) {
+        delete cart[id];
+    }
+
+    const quantityElement = document.getElementById("qty-" + id);
+
+    if (quantityElement) {
+        quantityElement.innerText = cart[id] || 0;
+    }
+
+    updateSummary();
+}
+
+
+// UPDATE ORDER SUMMARY
+
+function updateSummary() {
+
+    let total = 0;
+    let html = "";
+
+    Object.keys(cart).forEach(id => {
+
+        const [category, index] = id.split("-");
+        const item = menu[category][Number(index)];
+
+        const quantity = cart[id];
+        const amount = item.price * quantity;
+
+        total += amount;
+
+        html += `
+            <div class="summary-item">
+                <img src="${item.image}" alt="${item.name}">
+                <span>${item.name} × ${quantity} = ₹${amount}</span>
+                <button onclick="removeItem('${id}')">X</button>
+            </div>
+        `;
+
+    });
+
+    document.getElementById("cart").innerHTML =
+        html || "No items selected.";
+
+    document.getElementById("total").innerText = total;
+
+}
+
+
+// REMOVE ITEM
+
+function removeItem(id) {
+
+    delete cart[id];
+
+    const quantityElement = document.getElementById("qty-" + id);
+
+    if (quantityElement) {
+        quantityElement.innerText = 0;
+    }
+
+    updateSummary();
+}
+
+
+// PLACE FOOD ORDER
+
+function placeOrder() {
+
+    const items = [];
+    let total = 0;
+
+    Object.keys(cart).forEach(id => {
+
+        const [category, index] = id.split("-");
+        const item = menu[category][Number(index)];
+
+        const quantity = cart[id];
+        const itemTotal = item.price * quantity;
+
+        items.push({
+            name: item.name,
+            category: category,
+            quantity: quantity,
+            price: item.price,
+            itemTotal: itemTotal,
+            image: item.image
+        });
+
+        total += itemTotal;
+
+    });
+
+
+    if (items.length === 0) {
+
+        document.getElementById("message").style.color = "red";
+        document.getElementById("message").innerText =
+            "Please select food items!";
+
+        return;
+    }
+
+
+    const bookingData =
+        JSON.parse(localStorage.getItem("latestBooking")) ||
+        JSON.parse(localStorage.getItem("bookingDetails")) ||
+        {};
+
+
+    const orders =
+        JSON.parse(localStorage.getItem("roomServiceOrders")) || [];
+
+
+    const order = {
+
+        orderId: "RS" + Date.now(),
+
+        bookingId:
+            bookingData.bookingId ||
+            localStorage.getItem("bookingId") ||
+            "Not available",
+
+        hotelName:
+            bookingData.hotelName ||
+            localStorage.getItem("hotelName") ||
+            "StayEase Hotel",
+
+        roomNumber:
+            bookingData.roomNumber ||
+            "Not specified",
+
+        items: items,
+
+        total: total,
+
+        status: "Pending",
+
+        orderDate: new Date().toLocaleString()
+
+    };
+
+
+    orders.push(order);
+
+    localStorage.setItem(
+        "roomServiceOrders",
+        JSON.stringify(orders)
+    );
+
+    localStorage.setItem(
+        "latestFoodOrder",
+        JSON.stringify(order)
+    );
+
+
+    document.getElementById("message").style.color = "green";
+
+    document.getElementById("message").innerText =
+        "Food Order Placed Successfully!";
+
+
+    cart = {};
+
+    updateSummary();
+
+    document.querySelectorAll('[id^="qty-"]').forEach(element => {
+        element.innerText = "0";
+    });
+
+
+    setTimeout(() => {
+
+        window.location.href = "room-service-orders.html";
+
+    }, 1000);
+
+}
+
+
+// START
+
+displayMenu();
+updateSummary();
+
+</script>
+
+</body>
+</html>

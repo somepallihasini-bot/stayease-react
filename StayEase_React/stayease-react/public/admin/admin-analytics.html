@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Analytics - StayEase</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #222;
+}
+
+header {
+    background: #173b67;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 25px auto;
+    padding: 20px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 18px;
+}
+
+.stat-card {
+    background: white;
+    padding: 22px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #ddd;
+}
+
+.stat-card h3 {
+    color: #666;
+    font-size: 15px;
+}
+
+.stat-card h2 {
+    color: #173b67;
+    font-size: 28px;
+}
+
+.section {
+    background: white;
+    padding: 22px;
+    margin-top: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #ddd;
+}
+
+.section h2 {
+    color: #173b67;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 13px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+th {
+    background: #173b67;
+    color: white;
+}
+
+.bar-row {
+    margin: 18px 0;
+}
+
+.bar-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.bar-bg {
+    width: 100%;
+    background: #e5eaf0;
+    height: 16px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 16px;
+    background: #2879bd;
+    border-radius: 10px;
+}
+
+button {
+    background: #173b67;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+button:hover {
+    background: #24568e;
+}
+
+@media(max-width: 600px) {
+    table {
+        font-size: 12px;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>📊 StayEase Admin Analytics</h1>
+    <a href="/admin/dashboard">← Back to Admin Dashboard</a>
+</header>
+
+<div class="container">
+
+    <h2>Business Overview</h2>
+
+    <div class="stats">
+
+        <div class="stat-card">
+            <h3>💰 Total Revenue</h3>
+            <h2 id="revenue">₹0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>📋 Total Bookings</h3>
+            <h2 id="totalBookings">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>✅ Confirmed Bookings</h3>
+            <h2 id="confirmed">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>❌ Cancelled Bookings</h3>
+            <h2 id="cancelled">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h3>🏨 Total Hotels</h3>
+            <h2 id="totalHotels">0</h2>
+        </div>
+
+    </div>
+
+    <div class="section">
+        <h2>📈 Monthly Revenue</h2>
+        <div id="monthlyChart"></div>
+    </div>
+
+    <div class="section">
+        <h2>📊 Booking Status Report</h2>
+        <div id="statusChart"></div>
+    </div>
+
+    <div class="section">
+        <h2>🏆 Top Performing Hotels</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Hotel Name</th>
+                    <th>Total Bookings</th>
+                    <th>Revenue</th>
+                </tr>
+            </thead>
+
+            <tbody id="hotelTable"></tbody>
+        </table>
+    </div>
+
+    <button onclick="loadAnalytics()">🔄 Refresh Analytics</button>
+    <button onclick="window.print()">🖨️ Print Report</button>
+
+</div>
+
+<script>
+
+// ADMIN LOGIN CHECK
+
+if (localStorage.getItem("adminLogin") !== "true") {
+    alert("Please login as Admin!");
+    window.location.href = "/admin/login";
+}
+
+
+// LOAD DATA
+
+function loadAnalytics() {
+
+    let bookings = JSON.parse(
+        localStorage.getItem("bookings")
+    ) || [];
+
+    let hotels = JSON.parse(
+        localStorage.getItem("adminHotels")
+    ) || [];
+
+    // BOOKING STATISTICS
+
+    let confirmedBookings = bookings.filter(
+        b => b.status === "Confirmed"
+    );
+
+    let cancelledBookings = bookings.filter(
+        b => b.status === "Cancelled"
+    );
+
+    let totalRevenue = confirmedBookings.reduce(
+        (sum, b) => sum + Number(
+            b.totalAmount ?? b.finalAmount ?? 0
+        ), 0
+    );
+
+    document.getElementById("revenue").innerText =
+        "₹" + totalRevenue.toLocaleString("en-IN");
+
+    document.getElementById("totalBookings").innerText =
+        bookings.length;
+
+    document.getElementById("confirmed").innerText =
+        confirmedBookings.length;
+
+    document.getElementById("cancelled").innerText =
+        cancelledBookings.length;
+
+    document.getElementById("totalHotels").innerText =
+        hotels.length;
+
+
+    // MONTHLY REVENUE
+
+    let monthlyData = {};
+
+    confirmedBookings.forEach(booking => {
+
+        let date = new Date(booking.bookingDate);
+
+        if (isNaN(date.getTime())) return;
+
+        let month = date.toLocaleString("en-IN", {
+            month: "short",
+            year: "numeric"
+        });
+
+        let key = date.getFullYear() + "-" +
+            String(date.getMonth() + 1).padStart(2, "0");
+
+        if (!monthlyData[key]) {
+            monthlyData[key] = {
+                month: month,
+                revenue: 0
+            };
+        }
+
+        monthlyData[key].revenue += Number(
+            booking.totalAmount ?? booking.finalAmount ?? 0
+        );
+
+    });
+
+    let months = Object.keys(monthlyData).sort();
+
+    let maxRevenue = Math.max(
+        1,
+        ...months.map(m => monthlyData[m].revenue)
+    );
+
+    let chart = document.getElementById("monthlyChart");
+
+    if (months.length === 0) {
+        chart.innerHTML = "<p>No monthly revenue data available.</p>";
+    } else {
+
+        chart.innerHTML = months.map(key => {
+
+            let item = monthlyData[key];
+
+            let width = (item.revenue / maxRevenue) * 100;
+
+            return `
+                <div class="bar-row">
+                    <div class="bar-label">
+                        <span>${item.month}</span>
+                        <b>₹${item.revenue.toLocaleString("en-IN")}</b>
+                    </div>
+                    <div class="bar-bg">
+                        <div class="bar" style="width:${width}%"></div>
+                    </div>
+                </div>
+            `;
+
+        }).join("");
+
+    }
+
+
+    // BOOKING STATUS REPORT
+
+    let total = bookings.length;
+
+    let pending = bookings.filter(
+        b => b.status === "Pending"
+    ).length;
+
+    let statuses = [
+        { name: "Confirmed", count: confirmedBookings.length },
+        { name: "Cancelled", count: cancelledBookings.length },
+        { name: "Pending", count: pending }
+    ];
+
+    document.getElementById("statusChart").innerHTML =
+        statuses.map(item => {
+
+            let width = total
+                ? (item.count / total) * 100
+                : 0;
+
+            return `
+                <div class="bar-row">
+                    <div class="bar-label">
+                        <span>${item.name}</span>
+                        <b>${item.count}</b>
+                    </div>
+                    <div class="bar-bg">
+                        <div class="bar" style="width:${width}%"></div>
+                    </div>
+                </div>
+            `;
+
+        }).join("");
+
+
+    // TOP PERFORMING HOTELS
+
+    let hotelData = {};
+
+    confirmedBookings.forEach(booking => {
+
+        let name = booking.hotelName || "Unknown Hotel";
+
+        if (!hotelData[name]) {
+            hotelData[name] = {
+                count: 0,
+                revenue: 0
+            };
+        }
+
+        hotelData[name].count++;
+
+        hotelData[name].revenue += Number(
+            booking.totalAmount ?? booking.finalAmount ?? 0
+        );
+
+    });
+
+    let topHotels = Object.entries(hotelData)
+        .sort((a, b) => b[1].revenue - a[1].revenue);
+
+    let table = document.getElementById("hotelTable");
+
+    if (topHotels.length === 0) {
+        table.innerHTML =
+            "<tr><td colspan='3'>No hotel booking data available.</td></tr>";
+    } else {
+
+        table.innerHTML = topHotels.map(([name, data]) => `
+            <tr>
+                <td>${name}</td>
+                <td>${data.count}</td>
+                <td>₹${data.revenue.toLocaleString("en-IN")}</td>
+            </tr>
+        `).join("");
+
+    }
+
+}
+
+loadAnalytics();
+
+</script>
+
+</body>
+</html>

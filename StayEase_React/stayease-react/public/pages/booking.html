@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StayEase - Booking</title>
+<link rel="stylesheet" href="../style.css">
+
+<style>
+.booking-container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+.booking-card {
+    background: white;
+    padding: 22px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.booking-card h2 {
+    margin-top: 0;
+    color: #243b55;
+}
+
+.hotel-info {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.hotel-info img {
+    width: 180px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+    gap: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+    box-sizing: border-box;
+}
+
+.room-service-note {
+    background: #eef8f2;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.food-category {
+    margin-top: 25px;
+}
+
+.food-category h3 {
+    color: #243b55;
+    padding-bottom: 9px;
+    border-bottom: 2px solid #e3eaf2;
+}
+
+.food-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(190px,1fr));
+    gap: 15px;
+}
+
+.food-item {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: 0.2s;
+}
+
+.food-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 13px rgba(0,0,0,0.12);
+}
+
+.food-item img {
+    width: 100%;
+    height: 145px;
+    object-fit: cover;
+    display: block;
+}
+
+.food-details {
+    padding: 12px;
+}
+
+.food-details h4 {
+    margin: 0 0 8px;
+    font-size: 16px;
+}
+
+.food-price {
+    color: #13803b;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.food-quantity {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.food-quantity button {
+    width: 35px;
+    height: 34px;
+    padding: 0;
+    background: #e7eef8;
+    color: #243b55;
+    border: none;
+    border-radius: 7px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.food-quantity button:hover {
+    background: #cbdcf2;
+}
+
+.food-quantity span {
+    font-weight: bold;
+    font-size: 17px;
+}
+
+.food-summary {
+    background: #f4f8fc;
+    padding: 15px;
+    border-radius: 9px;
+    margin-top: 20px;
+}
+
+.food-total {
+    color: green;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.total-row {
+    border-top: 1px solid #ddd;
+    font-size: 20px;
+    font-weight: bold;
+    padding-top: 15px;
+}
+
+.booking-btn {
+    width: 100%;
+    padding: 14px;
+    background: #243b55;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 17px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.booking-btn:hover {
+    background: #141e30;
+}
+
+.apply-btn {
+    width: 100%;
+    padding: 11px;
+    background: #243b55;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+.message {
+    color: #d00;
+    margin-top: 10px;
+}
+
+.note {
+    color: #666;
+    font-size: 13px;
+}
+
+@media(max-width:600px) {
+    .booking-container {
+        padding: 10px;
+    }
+
+    .hotel-info img {
+        width: 100%;
+        height: 190px;
+    }
+
+    .food-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 9px;
+    }
+
+    .food-item img {
+        height: 110px;
+    }
+
+    .food-details {
+        padding: 9px;
+    }
+
+    .food-details h4 {
+        font-size: 14px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="booking-container">
+
+<h1>Complete Your Booking</h1>
+
+<!-- HOTEL DETAILS -->
+
+<div class="booking-card">
+
+    <h2>Hotel Details</h2>
+
+    <div class="hotel-info">
+
+        <img id="hotelImage" src="" alt="Hotel Image">
+
+        <div>
+            <h3 id="hotelName">Hotel Name</h3>
+
+            <p id="hotelLocation">Location</p>
+
+            <p>
+                Hotel Price: ₹<span id="hotelPrice">0</span> / night
+            </p>
+
+            <p>
+                Room Price: ₹<span id="roomPrice">0</span> / night
+            </p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CUSTOMER DETAILS -->
+
+<div class="booking-card">
+
+    <h2>Customer Details</h2>
+
+    <div class="form-grid">
+
+        <div class="form-group">
+            <label>Customer Name</label>
+
+            <input
+                type="text"
+                id="customerName"
+                placeholder="Enter your name"
+            >
+        </div>
+
+        <div class="form-group">
+            <label>Contact Number</label>
+
+            <input
+                type="tel"
+                id="contactNumber"
+                maxlength="10"
+                placeholder="Enter 10 digit mobile number"
+            >
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- BOOKING DETAILS -->
+
+<div class="booking-card">
+
+    <h2>Booking Details</h2>
+
+    <div class="form-grid">
+
+        <div class="form-group">
+
+            <label>Room Type</label>
+
+            <select id="roomType"
+                onchange="loadRooms(); calculateTotal();">
+
+                <option value="Standard">Standard</option>
+                <option value="Deluxe">Deluxe</option>
+                <option value="Executive">Executive</option>
+                <option value="Suite">Suite</option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Room Number</label>
+
+            <select id="roomNumber"></select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Check-in Date</label>
+
+            <input
+                type="date"
+                id="checkIn"
+                onchange="updateCheckout();"
+            >
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Check-out Date</label>
+
+            <input
+                type="date"
+                id="checkOut"
+                onchange="calculateTotal();"
+            >
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Guests</label>
+
+            <select id="guests">
+
+                <option value="1">1 Guest</option>
+                <option value="2" selected>2 Guests</option>
+                <option value="3">3 Guests</option>
+                <option value="4">4 Guests</option>
+                <option value="5">5 Guests</option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- FOOD MENU -->
+
+<div class="booking-card">
+
+    <h2>🍽️ Food Menu - Order During Booking</h2>
+
+    <div class="room-service-note">
+
+        <strong>🛎️ Delivery: Room Service Only</strong>
+
+        <p>
+            Choose your food items and quantity.
+            Food charges will be added to your booking bill.
+            Food ordering is optional.
+        </p>
+
+    </div>
+
+
+    <!-- STARTERS -->
+
+    <div class="food-category">
+
+        <h3>⭐ Starters & Snacks</h3>
+
+        <div class="food-grid" id="startersMenu"></div>
+
+    </div>
+
+
+    <!-- VEG MEALS -->
+
+    <div class="food-category">
+
+        <h3>🥗 Veg Meals</h3>
+
+        <div class="food-grid" id="vegMenu"></div>
+
+    </div>
+
+
+    <!-- NON VEG MEALS -->
+
+    <div class="food-category">
+
+        <h3>🍗 Non-Veg Meals</h3>
+
+        <div class="food-grid" id="nonVegMenu"></div>
+
+    </div>
+
+
+    <!-- DRINKS -->
+
+    <div class="food-category">
+
+        <h3>🥤 Juices & Drinks</h3>
+
+        <div class="food-grid" id="drinksMenu"></div>
+
+    </div>
+
+
+    <!-- FOOD SUMMARY -->
+
+    <div class="food-summary">
+
+        <h3>🛒 Selected Food Items</h3>
+
+        <div id="selectedFoodItems">
+            No food items selected.
+        </div>
+
+        <p class="food-total">
+            Food Total: ₹<span id="foodTotalDisplay">0</span>
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- COUPON -->
+
+<div class="booking-card">
+
+    <h2>Apply Coupon</h2>
+
+    <div class="form-grid">
+
+        <div class="form-group">
+
+            <label>Coupon Code</label>
+
+            <input
+                type="text"
+                id="couponCode"
+                placeholder="SAVE10"
+            >
+
+        </div>
+
+        <div class="form-group">
+
+            <label>&nbsp;</label>
+
+            <button
+                type="button"
+                class="apply-btn"
+                onclick="applyCoupon()">
+
+                Apply Coupon
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <p class="note">
+        Available Coupons: SAVE10, WELCOME20, STAYEASE15
+    </p>
+
+    <p id="couponMessage"></p>
+
+</div>
+
+
+<!-- PRICE SUMMARY -->
+
+<div class="booking-card">
+
+    <h2>Price Summary</h2>
+
+    <div class="price-row">
+        <span>Hotel Amount</span>
+        <span>₹<span id="hotelAmount">0</span></span>
+    </div>
+
+    <div class="price-row">
+        <span>Room Amount</span>
+        <span>₹<span id="roomAmount">0</span></span>
+    </div>
+
+    <div class="price-row">
+        <span>Number of Nights</span>
+        <span id="nights">0</span>
+    </div>
+
+    <div class="price-row">
+        <span>Food Charges</span>
+        <span>₹<span id="foodAmount">0</span></span>
+    </div>
+
+    <div class="price-row">
+        <span>Subtotal</span>
+        <span>₹<span id="subtotal">0</span></span>
+    </div>
+
+    <div class="price-row">
+        <span>Coupon Discount</span>
+        <span>₹<span id="discount">0</span></span>
+    </div>
+
+    <div class="price-row total-row">
+        <span>Final Amount</span>
+        <span>₹<span id="finalAmount">0</span></span>
+    </div>
+
+    <p id="bookingMessage" class="message"></p>
+
+    <button
+        class="booking-btn"
+        onclick="continuePayment()">
+
+        Continue to Payment
+
+    </button>
+
+</div>
+
+</div>
+
+
+<script>
+
+// CURRENT USER
+
+let currentUser = null;
+
+try {
+    currentUser = JSON.parse(
+        localStorage.getItem("currentUser")
+    );
+} catch (error) {
+    currentUser = null;
+}
+
+let userName = localStorage.getItem("userName") || "";
+let userEmail = localStorage.getItem("userEmail") || "";
+
+if (!currentUser && !userName && !userEmail) {
+
+    alert("Please login first!");
+
+    window.location.href = "/login";
+
+}
+
+
+// HOTEL DETAILS
+
+const hotelName =
+    localStorage.getItem("hotelName") || "StayEase Hotel";
+
+const hotelLocation =
+    localStorage.getItem("hotelLocation") || "India";
+
+const hotelSubLocation =
+    localStorage.getItem("hotelSubLocation") || "";
+
+const hotelImage =
+    localStorage.getItem("hotelImage") || "";
+
+const hotelPrice =
+    Number(localStorage.getItem("hotelPrice")) || 0;
+
+const roomPrice =
+    Number(localStorage.getItem("roomPrice")) || 0;
+
+
+// DISPLAY HOTEL DETAILS
+
+document.getElementById("hotelName").textContent =
+    hotelName;
+
+document.getElementById("hotelLocation").textContent =
+    hotelLocation +
+    (hotelSubLocation ? ", " + hotelSubLocation : "");
+
+document.getElementById("hotelPrice").textContent =
+    hotelPrice;
+
+document.getElementById("roomPrice").textContent =
+    roomPrice;
+
+const hotelImageElement =
+    document.getElementById("hotelImage");
+
+hotelImageElement.src = hotelImage ||
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800";
+
+hotelImageElement.onerror = function() {
+    this.onerror = null;
+    this.src = "https://placehold.co/600x300?text=Hotel";
+};
+
+
+// CUSTOMER NAME
+
+document.getElementById("customerName").value =
+    currentUser?.name ||
+    currentUser?.userName ||
+    userName;
+
+
+// DATE SETTINGS
+
+function getLocalDate() {
+
+    const date = new Date();
+
+    return date.getFullYear() + "-" +
+        String(date.getMonth() + 1).padStart(2, "0") + "-" +
+        String(date.getDate()).padStart(2, "0");
+
+}
+
+const todayString = getLocalDate();
+
+document.getElementById("checkIn").min = todayString;
+
+document.getElementById("checkOut").min = todayString;
+
+
+// FOOD MENU DATA
+
+const foodItemsList = [
+
+    // STARTERS & SNACKS
+
+    {
+        id: 2,
+        category: "starters",
+        name: "Paneer Tikka",
+        price: 180,
+        image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=600"
+    },
+    {
+        id: 3,
+        category: "starters",
+        name: "Samosa",
+        price: 60,
+        image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600"
+    },
+    {
+        id: 4,
+        category: "starters",
+        name: "French Fries",
+        price: 100,
+        image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=600"
+    },
+    {
+        id: 5,
+        category: "starters",
+        name: "Gobi 65",
+        price: 140,
+        image: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=600"
+    },
+
+    // VEG MEALS
+
+    {
+        id: 6,
+        category: "veg",
+        name: "Veg Thali",
+        price: 200,
+        image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600"
+    },
+    {
+        id: 7,
+        category: "veg",
+        name: "South Indian Meals",
+        price: 180,
+        image: "https://images.unsplash.com/photo-1630383249896-424e482df921?w=600"
+    },
+    {
+        id: 8,
+        category: "veg",
+        name: "North Indian Thali",
+        price: 220,
+        image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600"
+    },
+    {
+        id: 9,
+        category: "veg",
+        name: "Veg Fried Rice",
+        price: 160,
+        image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600"
+    },
+
+    // NON VEG MEALS
+
+    {
+        id: 10,
+        category: "nonveg",
+        name: "Chicken Meals",
+        price: 250,
+        image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=600"
+    },
+    {
+        id: 11,
+        category: "nonveg",
+        name: "Chicken Biryani",
+        price: 250,
+        image: 
+    {
+        id: 12,
+        category: "nonveg",
+        name: "Mutton Biryani",
+        price: 350,
+        image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=600"
+    },
+    
+        id: 13,
+        category: "nonveg",
+        name: "Fish Meals",
+        price: 260,
+        image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600"
+    },
+    {
+        id: 14,
+        category: "nonveg",
+        name: "Chicken Fried Rice",
+        price: 240,
+        image: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600"
+    },
+
+    // JUICES & DRINKS
+
+    {
+        id: 15,
+        category: "drinks",
+        name: "Orange Juice",
+        price: 80,
+        image: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=600"
+    },
+    {
+        id: 16,
+        category: "drinks",
+        name: "Mango Juice",
+        price: 90,
+        image: "https://images.unsplash.com/photo-1546173159-315724a31696?w=600"
+    },
+    
+    {
+        id: 18,
+        category: "drinks",
+        name: "Coke",
+        price: 50,
+        image: "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=600"
+    },
+    {
+        id: 19,
+        category: "drinks",
+        name: "Sprite",
+        price: 50,
+        image: "https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=600"
+    },
+    {
+        id: 20,
+        category: "drinks",
+        name: "Thums Up",
+        price: 50,
+        image: "https://images.unsplash.com/photo-1629203851122-3726ecdf080e?w=600"
+    },
+    {
+        id: 21,
+        category: "drinks",
+        name: "Water Bottle",
+        price: 20,
+        image: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600"
+    }
+
+];
+
+
+// FOOD QUANTITIES
+
+let foodQuantities = {};
+
+
+// DISPLAY FOOD MENU
+
+function displayFoodMenu() {
+
+    const categoryElements = {
+
+        starters: "startersMenu",
+
+        veg: "vegMenu",
+
+        nonveg: "nonVegMenu",
+
+        drinks: "drinksMenu"
+
+    };
+
+    Object.keys(categoryElements).forEach(category => {
+
+        const items = foodItemsList.filter(
+            item => item.category === category
+        );
+
+        document.getElementById(
+            categoryElements[category]
+        ).innerHTML = items.map(item => `
+
+            <div class="food-item">
+
+                <img
+                    src="${item.image}"
+                    alt="${item.name}"
+                    loading="lazy"
+                    onerror="this.onerror=null;this.src='https://placehold.co/400x250?text=Food+Image';"
+                >
+
+                <div class="food-details">
+
+                    <h4>${item.name}</h4>
+
+                    <p class="food-price">
+                        ₹${item.price}
+                    </p>
+
+                    <div class="food-quantity">
+
+                        <button
+                            type="button"
+                            onclick="changeFoodQty(${item.id},-1)">
+                            −
+                        </button>
+
+                        <span id="foodQty${item.id}">0</span>
+
+                        <button
+                            type="button"
+                            onclick="changeFoodQty(${item.id},1)">
+                            +
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `).join("");
+
+    });
+
+}
+
+
+// CHANGE FOOD QUANTITY
+
+function changeFoodQty(id, change) {
+
+    let current = foodQuantities[id] || 0;
+
+    foodQuantities[id] = Math.max(
+        0,
+        Math.min(10, current + change)
+    );
+
+    document.getElementById(
+        "foodQty" + id
+    ).textContent = foodQuantities[id];
+
+    calculateFoodTotal();
+
+}
+
+
+// GET SELECTED FOOD
+
+function getSelectedFood() {
+
+    const selected = [];
+
+    foodItemsList.forEach(item => {
+
+        const quantity = foodQuantities[item.id] || 0;
+
+        if (quantity > 0) {
+
+            selected.push({
+
+                name: item.name,
+
+                price: item.price,
+
+                quantity: quantity,
+
+                total: item.price * quantity
+
+            });
+
+        }
+
+    });
+
+    return selected;
+
+}
+
+
+// FOOD TOTAL
+
+function getFoodTotal() {
+
+    return getSelectedFood().reduce(
+        (sum, item) => sum + item.total,
+        0
+    );
+
+}
+
+
+// UPDATE FOOD SUMMARY
+
+function calculateFoodTotal() {
+
+    const selected = getSelectedFood();
+
+    const total = getFoodTotal();
+
+    document.getElementById(
+        "selectedFoodItems"
+    ).innerHTML = selected.length
+        ? selected.map(item => `
+            <div class="price-row">
+                <span>${item.name} × ${item.quantity}</span>
+                <strong>₹${item.total}</strong>
+            </div>
+        `).join("")
+        : "No food items selected.";
+
+    document.getElementById(
+        "foodTotalDisplay"
+    ).textContent = total;
+
+    calculateTotal();
+
+}
+
+
+// ROOM NUMBERS
+
+function loadRooms() {
+
+    const roomType =
+        document.getElementById("roomType").value;
+
+    const rooms = {
+
+        Standard: [101,102,103,104,105,106,107,108],
+
+        Deluxe: [109,110,111,112,113,114],
+
+        Executive: [115,116,117,118],
+
+        Suite: [119,120]
+
+    };
+
+    const roomSelect =
+        document.getElementById("roomNumber");
+
+    roomSelect.innerHTML = rooms[roomType].map(room =>
+        `<option value="${room}">${room}</option>`
+    ).join("");
+
+}
+
+
+// CHECKOUT DATE
+
+function updateCheckout() {
+
+    const checkIn =
+        document.getElementById("checkIn").value;
+
+    if (checkIn) {
+
+        const nextDay = new Date(checkIn + "T00:00:00");
+
+        nextDay.setDate(nextDay.getDate() + 1);
+
+        const minCheckout =
+            nextDay.getFullYear() + "-" +
+            String(nextDay.getMonth() + 1).padStart(2, "0") + "-" +
+            String(nextDay.getDate()).padStart(2, "0");
+
+        const checkoutElement =
+            document.getElementById("checkOut");
+
+        checkoutElement.min = minCheckout;
+
+        if (
+            checkoutElement.value &&
+            checkoutElement.value < minCheckout
+        ) {
+            checkoutElement.value = minCheckout;
+        }
+
+    }
+
+    calculateTotal();
+
+}
+
+
+// CALCULATE NIGHTS
+
+function getNights() {
+
+    const checkIn =
+        document.getElementById("checkIn").value;
+
+    const checkOut =
+        document.getElementById("checkOut").value;
+
+    if (!checkIn || !checkOut) return 0;
+
+    const start = new Date(checkIn + "T00:00:00");
+
+    const end = new Date(checkOut + "T00:00:00");
+
+    return Math.ceil(
+        (end - start) / (1000 * 60 * 60 * 24)
+    );
+
+}
+
+
+// COUPON VARIABLES
+
+let couponDiscount = 0;
+
+let appliedCoupon = "";
+
+
+// CALCULATE TOTAL
+
+function calculateTotal() {
+
+    const nights = getNights();
+
+    const hotelAmount = hotelPrice * nights;
+
+    const roomAmount = roomPrice * nights;
+
+    const foodAmount = getFoodTotal();
+
+    const subtotal =
+        hotelAmount + roomAmount + foodAmount;
+
+    const discount = Math.round(
+        subtotal * couponDiscount / 100
+    );
+
+    const finalAmount = subtotal - discount;
+
+
+    document.getElementById("nights").textContent =
+        nights;
+
+    document.getElementById("hotelAmount").textContent =
+        hotelAmount.toFixed(2);
+
+    document.getElementById("roomAmount").textContent =
+        roomAmount.toFixed(2);
+
+    document.getElementById("foodAmount").textContent =
+        foodAmount.toFixed(2);
+
+    document.getElementById("subtotal").textContent =
+        subtotal.toFixed(2);
+
+    document.getElementById("discount").textContent =
+        discount.toFixed(2);
+
+    document.getElementById("finalAmount").textContent =
+        finalAmount.toFixed(2);
+
+}
+
+
+// APPLY COUPON
+
+function applyCoupon() {
+
+    const code = document.getElementById(
+        "couponCode"
+    ).value.trim().toUpperCase();
+
+    const coupons = {
+
+        SAVE10: 10,
+
+        WELCOME20: 20,
+
+        STAYEASE15: 15
+
+    };
+
+    const message = document.getElementById(
+        "couponMessage"
+    );
+
+    if (coupons[code]) {
+
+        couponDiscount = coupons[code];
+
+        appliedCoupon = code;
+
+        message.style.color = "green";
+
+        message.textContent =
+            code + " applied successfully! " +
+            couponDiscount + "% discount.";
+
+    } else {
+
+        couponDiscount = 0;
+
+        appliedCoupon = "";
+
+        message.style.color = "red";
+
+        message.textContent = "Invalid coupon code!";
+
+    }
+
+    calculateTotal();
+
+}
+
+
+// CHECK ROOM AVAILABILITY
+
+function checkRoomAvailability() {
+
+    const bookings = JSON.parse(
+        localStorage.getItem("bookings") || "[]"
+    );
+
+    const selectedRoom =
+        document.getElementById("roomNumber").value;
+
+    const checkIn =
+        document.getElementById("checkIn").value;
+
+    const checkOut =
+        document.getElementById("checkOut").value;
+
+    return !bookings.some(booking => {
+
+        const status =
+            booking.bookingStatus || booking.status || "";
+
+        if (status.toLowerCase() === "cancelled") {
+            return false;
+        }
+
+        const oldCheckIn =
+            booking.checkIn || booking.checkin;
+
+        const oldCheckOut =
+            booking.checkOut || booking.checkout;
+
+        const sameHotel =
+            booking.hotelName === hotelName;
+
+        const sameRoom =
+            String(booking.roomNumber) === String(selectedRoom);
+
+        if (!sameHotel || !sameRoom ||
+            !oldCheckIn || !oldCheckOut) {
+            return false;
+        }
+
+        return (
+            checkIn < oldCheckOut &&
+            checkOut > oldCheckIn
+        );
+
+    });
+
+}
+
+
+// CONTINUE TO PAYMENT
+
+function continuePayment() {
+
+    const name = document.getElementById(
+        "customerName"
+    ).value.trim();
+
+    const contact = document.getElementById(
+        "contactNumber"
+    ).value.trim();
+
+    const roomType = document.getElementById(
+        "roomType"
+    ).value;
+
+    const roomNumber = document.getElementById(
+        "roomNumber"
+    ).value;
+
+    const checkIn = document.getElementById(
+        "checkIn"
+    ).value;
+
+    const checkOut = document.getElementById(
+        "checkOut"
+    ).value;
+
+    const guests = Number(
+        document.getElementById("guests").value
+    );
+
+    const nights = getNights();
+
+    const foodItems = getSelectedFood();
+
+    const foodTotal = getFoodTotal();
+
+    const hotelAmount = hotelPrice * nights;
+
+    const roomAmount = roomPrice * nights;
+
+    const subtotal =
+        hotelAmount + roomAmount + foodTotal;
+
+    const discount = Math.round(
+        subtotal * couponDiscount / 100
+    );
+
+    const finalAmount = subtotal - discount;
+
+    const message = document.getElementById(
+        "bookingMessage"
+    );
+
+    message.style.color = "red";
+
+    message.textContent = "";
+
+
+    // VALIDATION
+
+    if (!name || !contact || !checkIn || !checkOut) {
+
+        message.textContent =
+            "Please fill all required details!";
+
+        return;
+
+    }
+
+    if (!/^[0-9]{10}$/.test(contact)) {
+
+        message.textContent =
+            "Enter a valid 10 digit contact number!";
+
+        return;
+
+    }
+
+    if (hotelPrice <= 0 || roomPrice <= 0) {
+
+        message.textContent =
+            "Hotel price or room price is missing.";
+
+        return;
+
+    }
+
+    if (nights <= 0) {
+
+        message.textContent =
+            "Check-out date must be after check-in date!";
+
+        return;
+
+    }
+
+    if (checkIn < todayString) {
+
+        message.textContent =
+            "Please select a valid check-in date.";
+
+        return;
+
+    }
+
+    if (!checkRoomAvailability()) {
+
+        message.textContent =
+            "This room is already booked for selected dates!";
+
+        return;
+
+    }
+
+
+    // BOOKING DETAILS
+
+    const bookingDetails = {
+
+        userId:
+            currentUser?.id ||
+            currentUser?.userId ||
+            userEmail,
+
+        userName:
+            currentUser?.name ||
+            currentUser?.userName ||
+            userName ||
+            name,
+
+        userEmail:
+            currentUser?.email ||
+            currentUser?.userEmail ||
+            userEmail,
+
+        customerName: name,
+
+        contactNumber: contact,
+
+        hotelName: hotelName,
+
+        hotelLocation: hotelLocation,
+
+        hotelSubLocation: hotelSubLocation,
+
+        hotelImage: hotelImage,
+
+        roomType: roomType,
+
+        roomNumber: roomNumber,
+
+        checkIn: checkIn,
+
+        checkOut: checkOut,
+
+        checkin: checkIn,
+
+        checkout: checkOut,
+
+        guests: guests,
+
+        nights: nights,
+
+        hotelPrice: hotelPrice,
+
+        roomPrice: roomPrice,
+
+        hotelAmount: hotelAmount,
+
+        roomAmount: roomAmount,
+
+        foodIncluded: false,
+
+        meals: [],
+
+        foodItems: foodItems,
+
+        foodTotal: foodTotal,
+
+        foodCharge: foodTotal,
+
+        foodDelivery:
+            foodItems.length > 0
+                ? "Room Service"
+                : "Not Ordered",
+
+        diningType:
+            foodItems.length > 0
+                ? "Room Service"
+                : "Not Ordered",
+
+        foodOrderTiming:
+            foodItems.length > 0
+                ? "At Booking"
+                : "Not Ordered",
+
+        couponCode: appliedCoupon,
+
+        couponDiscount: discount,
+
+        discount: discount,
+
+        subtotal: subtotal,
+
+        finalAmount: finalAmount,
+
+        totalAmount: finalAmount
+
+    };
+
+
+    // SAVE BOOKING DETAILS
+
+    localStorage.setItem(
+        "bookingDetails",
+        JSON.stringify(bookingDetails)
+    );
+
+
+    // GO TO PAYMENT
+
+    window.location.href = "payment.html";
+
+}
+
+
+// INITIALIZE PAGE
+
+displayFoodMenu();
+
+loadRooms();
+
+calculateTotal();
+
+</script>
+
+</body>
+</html>

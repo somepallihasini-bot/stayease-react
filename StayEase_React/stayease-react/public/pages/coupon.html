@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StayEase - Apply Coupon</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f3f6fb;
+            color: #222;
+        }
+
+        header {
+            background: #142d4e;
+            color: white;
+            padding: 20px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            color: #ffcc66;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #ddd;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-bottom: 18px;
+        }
+
+        .coupon-input {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        input {
+            flex: 1;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            text-transform: uppercase;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 6px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        .coupon {
+            border: 1px dashed #2563eb;
+            background: #eff6ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 12px 0;
+            cursor: pointer;
+        }
+
+        .coupon h3 {
+            color: #2563eb;
+            margin-bottom: 6px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+        }
+
+        .total {
+            font-size: 21px;
+            font-weight: bold;
+            color: #15803d;
+        }
+
+        #message {
+            margin: 12px 0;
+            font-weight: bold;
+        }
+
+        .continue-btn {
+            width: 100%;
+            margin-top: 20px;
+            background: #16a34a;
+            font-size: 16px;
+        }
+
+        @media(max-width: 500px) {
+            .coupon-input {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>StayEase</h2>
+    <a href="/">Home</a>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>🎁 Apply Coupon</h2>
+
+        <p>Get exciting discounts on your hotel booking!</p>
+
+        <div class="coupon-input">
+            <input type="text" id="couponCode"
+                   placeholder="Enter coupon code">
+
+            <button onclick="applyCoupon()">Apply</button>
+        </div>
+
+        <p id="message"></p>
+    </div>
+
+    <div class="card">
+        <h2>Available Coupons</h2>
+
+        <div class="coupon" onclick="selectCoupon('SAVE10')">
+            <h3>SAVE10</h3>
+            <p>Get 10% discount on your booking.</p>
+        </div>
+
+        <div class="coupon" onclick="selectCoupon('WELCOME20')">
+            <h3>WELCOME20</h3>
+            <p>Get 20% discount on your booking.</p>
+        </div>
+
+        <div class="coupon" onclick="selectCoupon('STAYEASE15')">
+            <h3>STAYEASE15</h3>
+            <p>Get 15% discount on your booking.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Booking Summary</h2>
+
+        <div class="price-row">
+            <span>Hotel</span>
+            <span id="hotelName">-</span>
+        </div>
+
+        <div class="price-row">
+            <span>Original Amount</span>
+            <span id="originalAmount">₹0</span>
+        </div>
+
+        <div class="price-row">
+            <span>Discount</span>
+            <span id="discountAmount">₹0</span>
+        </div>
+
+        <hr>
+
+        <div class="price-row total">
+            <span>Final Amount</span>
+            <span id="finalAmount">₹0</span>
+        </div>
+
+        <button class="continue-btn" onclick="continuePayment()">
+            Continue to Payment
+        </button>
+    </div>
+
+</div>
+
+<script>
+
+    // Get booking details
+    let booking = JSON.parse(
+        localStorage.getItem("bookingDetails") || "null"
+    );
+
+    let originalAmount = 0;
+    let discountAmount = 0;
+    let finalAmount = 0;
+    let appliedCoupon = "";
+
+    const coupons = {
+        "SAVE10": 10,
+        "WELCOME20": 20,
+        "STAYEASE15": 15
+    };
+
+    function formatPrice(amount) {
+        return "₹" + Number(amount).toLocaleString("en-IN", {
+            maximumFractionDigits: 2
+        });
+    }
+
+    function initializePage() {
+
+        if (!booking) {
+            alert("Please complete your hotel booking first.");
+            window.location.href = "hotels.html";
+            return;
+        }
+
+        originalAmount = Number(booking.totalAmount || 0);
+
+        if (originalAmount <= 0) {
+            alert("Booking amount is not available.");
+            window.location.href = "booking.html";
+            return;
+        }
+
+        // Restore previously applied coupon if available
+        appliedCoupon = booking.couponCode || "";
+        discountAmount = Number(booking.discountAmount || 0);
+        finalAmount = Number(booking.finalAmount || originalAmount);
+
+        document.getElementById("hotelName").innerText =
+            booking.hotelName || "StayEase Hotel";
+
+        document.getElementById("originalAmount").innerText =
+            formatPrice(originalAmount);
+
+        document.getElementById("couponCode").value = appliedCoupon;
+
+        updateSummary();
+    }
+
+    function selectCoupon(code) {
+        document.getElementById("couponCode").value = code;
+        applyCoupon();
+    }
+
+    function applyCoupon() {
+
+        let code = document.getElementById("couponCode")
+            .value.trim().toUpperCase();
+
+        let message = document.getElementById("message");
+
+        if (!coupons.hasOwnProperty(code)) {
+            appliedCoupon = "";
+            discountAmount = 0;
+            finalAmount = originalAmount;
+
+            message.innerText = "Invalid coupon code!";
+            message.style.color = "red";
+
+            updateSummary();
+            return;
+        }
+
+        appliedCoupon = code;
+
+        let percentage = coupons[code];
+
+        discountAmount = originalAmount * percentage / 100;
+
+        finalAmount = originalAmount - discountAmount;
+
+        message.innerText =
+            code + " applied successfully! " +
+            percentage + "% discount.";
+
+        message.style.color = "green";
+
+        updateSummary();
+    }
+
+    function updateSummary() {
+
+        document.getElementById("originalAmount").innerText =
+            formatPrice(originalAmount);
+
+        document.getElementById("discountAmount").innerText =
+            formatPrice(discountAmount);
+
+        document.getElementById("finalAmount").innerText =
+            formatPrice(finalAmount);
+    }
+
+    function continuePayment() {
+
+        if (!booking) {
+            alert("Booking details not found.");
+            return;
+        }
+
+        // Save coupon and discounted amount
+        booking.originalAmount = originalAmount;
+        booking.couponCode = appliedCoupon;
+        booking.discountAmount = discountAmount;
+        booking.finalAmount = finalAmount;
+        booking.totalAmount = finalAmount;
+
+        localStorage.setItem(
+            "bookingDetails",
+            JSON.stringify(booking)
+        );
+
+        window.location.href = "payment.html";
+    }
+
+    initializePage();
+
+</script>
+
+</body>
+</html>

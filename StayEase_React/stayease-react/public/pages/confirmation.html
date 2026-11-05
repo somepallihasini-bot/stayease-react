@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking Confirmation - StayEase</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #333;
+}
+
+header {
+    background: #173b67;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.container {
+    max-width: 750px;
+    margin: 30px auto;
+    padding: 15px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 3px 12px #ddd;
+    margin-bottom: 20px;
+}
+
+.success {
+    text-align: center;
+    color: green;
+}
+
+.success-icon {
+    font-size: 65px;
+}
+
+.hotel-image {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.details {
+    background: #f3f7fc;
+    padding: 18px;
+    border-radius: 8px;
+    line-height: 1.9;
+}
+
+.food-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.total {
+    font-size: 24px;
+    color: green;
+    font-weight: bold;
+}
+
+.delivery {
+    background: #e8f7ee;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    background: #173b67;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+button:hover {
+    background: #24568e;
+}
+
+.secondary {
+    background: #198754;
+}
+
+.secondary:hover {
+    background: #126b40;
+}
+
+.no-food {
+    color: #777;
+}
+
+@media(max-width:600px) {
+    .card {
+        padding: 17px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>StayEase 🏨</h1>
+    <p>Booking Confirmation</p>
+</header>
+
+<div class="container">
+
+    <!-- SUCCESS -->
+
+    <div class="card success">
+
+        <div class="success-icon">✅</div>
+
+        <h1>Booking Confirmed!</h1>
+
+        <p>Your hotel booking has been successfully completed.</p>
+
+        <h3>
+            Booking ID:
+            <span id="bookingId"></span>
+        </h3>
+
+        <p>Status: <b id="bookingStatus">Confirmed</b></p>
+
+    </div>
+
+
+    <!-- HOTEL DETAILS -->
+
+    <div class="card">
+
+        <h2>🏨 Hotel Details</h2>
+
+        <img id="hotelImage" class="hotel-image" alt="Hotel Image">
+
+        <h3 id="hotelName"></h3>
+
+        <p>📍 Location: <span id="location"></span></p>
+
+        <p>📍 Area: <span id="subLocation"></span></p>
+
+    </div>
+
+
+    <!-- BOOKING DETAILS -->
+
+    <div class="card">
+
+        <h2>📋 Booking Details</h2>
+
+        <div class="details">
+
+            <p>Customer Name: <b id="customerName"></b></p>
+
+            <p>Contact Number: <b id="contactNumber"></b></p>
+
+            <p>Room Type: <b id="roomType"></b></p>
+
+            <p>Room Number: <b id="roomNumber"></b></p>
+
+            <p>Check-in: <b id="checkin"></b></p>
+
+            <p>Check-out: <b id="checkout"></b></p>
+
+            <p>Guests: <b id="guests"></b></p>
+
+            <p>Nights: <b id="nights"></b></p>
+
+        </div>
+
+    </div>
+
+
+    <!-- FOOD DETAILS -->
+
+    <div class="card">
+
+        <h2>🍽️ Food Order Details</h2>
+
+        <div id="foodItemsList"></div>
+
+        <div class="delivery">
+
+            <h3>🚚 Food Delivery</h3>
+
+            <p>
+                Delivery Type:
+                <b id="deliveryType">Room Service</b>
+            </p>
+
+            <p>
+                Order Timing:
+                <b id="orderTiming">At Booking</b>
+            </p>
+
+            <p>
+                Room Number:
+                <b id="foodRoomNumber">-</b>
+            </p>
+
+            <p>
+                Order Status:
+                <b id="foodStatus">Pending</b>
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- PRICE DETAILS -->
+
+    <div class="card">
+
+        <h2>💰 Price Details</h2>
+
+        <div class="details">
+
+            <p>
+                Hotel Amount:
+                ₹<b id="hotelTotal">0</b>
+            </p>
+
+            <p>
+                Room Amount:
+                ₹<b id="roomTotal">0</b>
+            </p>
+
+            <p>
+                Food Amount:
+                ₹<b id="foodTotal">0</b>
+            </p>
+
+            <hr>
+
+            <p>
+                Subtotal:
+                ₹<b id="subtotal">0</b>
+            </p>
+
+            <p>
+                Coupon:
+                <b id="coupon">No Coupon</b>
+            </p>
+
+            <p>
+                Discount:
+                ₹<b id="discount">0</b>
+            </p>
+
+            <hr>
+
+            <p class="total">
+                Total Amount:
+                ₹<span id="total">0</span>
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- PAYMENT DETAILS -->
+
+    <div class="card">
+
+        <h2>💳 Payment Details</h2>
+
+        <p>
+            Payment Method:
+            <b id="paymentMethod"></b>
+        </p>
+
+        <p>
+            Payment Status:
+            <b id="paymentStatus"></b>
+        </p>
+
+        <p>
+            Booking Date:
+            <b id="bookingDate"></b>
+        </p>
+
+    </div>
+
+
+    <!-- BUTTONS -->
+
+    <div class="card">
+
+        <button onclick="goToBookings()">
+            View My Bookings
+        </button>
+
+        <button class="secondary" onclick="goToQR()">
+            View QR Booking Pass
+        </button>
+
+        <button onclick="window.location.href='/'">
+            Back to Home
+        </button>
+
+        <button onclick="window.print()">
+            Print Confirmation
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+// GET LATEST BOOKING
+
+let booking = {};
+
+try {
+
+    booking = JSON.parse(
+        localStorage.getItem("latestBooking") || "{}"
+    );
+
+} catch (error) {
+
+    booking = {};
+
+}
+
+
+// CURRENCY FORMAT
+
+function formatPrice(value) {
+
+    return Number(value || 0).toLocaleString("en-IN", {
+        maximumFractionDigits: 2
+    });
+
+}
+
+
+// DISPLAY TEXT
+
+function setText(id, value) {
+
+    document.getElementById(id).textContent =
+        value !== undefined && value !== null && value !== ""
+            ? value
+            : "N/A";
+
+}
+
+
+// BOOKING ID
+
+setText(
+    "bookingId",
+    booking.bookingId || localStorage.getItem("bookingId")
+);
+
+setText(
+    "bookingStatus",
+    booking.bookingStatus || booking.status || "Confirmed"
+);
+
+
+// HOTEL DETAILS
+
+setText("hotelName", booking.hotelName);
+
+setText(
+    "location",
+    booking.location || booking.hotelLocation
+);
+
+setText(
+    "subLocation",
+    booking.subLocation || booking.hotelSubLocation
+);
+
+
+// CUSTOMER DETAILS
+
+setText(
+    "customerName",
+    booking.customerName || booking.userName
+);
+
+setText("contactNumber", booking.contactNumber);
+
+
+// ROOM DETAILS
+
+setText("roomType", booking.roomType);
+
+setText("roomNumber", booking.roomNumber);
+
+setText(
+    "checkin",
+    booking.checkIn || booking.checkin
+);
+
+setText(
+    "checkout",
+    booking.checkOut || booking.checkout
+);
+
+setText("guests", booking.guests || 1);
+
+setText("nights", booking.nights || 1);
+
+
+// HOTEL IMAGE
+
+const imageElement = document.getElementById("hotelImage");
+
+const hotelImage =
+    booking.hotelImage ||
+    localStorage.getItem("hotelImage") ||
+    "";
+
+imageElement.src = hotelImage ||
+    "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1000";
+
+imageElement.onerror = function() {
+
+    this.onerror = null;
+
+    this.src =
+        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1000";
+
+};
+
+
+// FOOD DETAILS
+
+const foodItems = Array.isArray(booking.foodItems)
+    ? booking.foodItems
+    : [];
+
+const foodList = document.getElementById("foodItemsList");
+
+let foodTotal = 0;
+
+if (foodItems.length > 0) {
+
+    foodList.innerHTML = foodItems.map(item => {
+
+        const quantity = Number(item.quantity || 0);
+
+        const price = Number(item.price || 0);
+
+        const itemTotal = Number(
+            item.total ?? (price * quantity)
+        );
+
+        foodTotal += itemTotal;
+
+        return `
+            <div class="food-item">
+
+                <span>
+                    ${escapeHTML(item.name)}
+                    × ${quantity}
+                </span>
+
+                <strong>
+                    ₹${formatPrice(itemTotal)}
+                </strong>
+
+            </div>
+        `;
+
+    }).join("");
+
+} else {
+
+    foodList.innerHTML =
+        '<p class="no-food">No food items selected for this booking.</p>';
+
+}
+
+
+// SAFE TEXT FOR FOOD ITEMS
+
+function escapeHTML(value) {
+
+    return String(value || "").replace(/[&<>"']/g, char => ({
+
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+
+    })[char]);
+
+}
+
+
+// DELIVERY DETAILS
+
+setText(
+    "deliveryType",
+    booking.foodDelivery || (
+        foodItems.length > 0 ? "Room Service" : "Not Ordered"
+    )
+);
+
+setText(
+    "orderTiming",
+    booking.foodOrderTiming || (
+        foodItems.length > 0 ? "At Booking" : "Not Ordered"
+    )
+);
+
+setText("foodRoomNumber", booking.roomNumber);
+
+setText(
+    "foodStatus",
+    foodItems.length > 0 ? "Pending" : "No Food Order"
+);
+
+
+// PRICE DETAILS
+
+const hotelTotal = Number(
+    booking.hotelAmount ??
+    booking.hotelTotal ??
+    (
+        Number(booking.hotelPrice || 0) *
+        Number(booking.nights || 1)
+    )
+);
+
+const roomTotal = Number(
+    booking.roomAmount ??
+    booking.roomTotal ??
+    (
+        Number(booking.roomPrice || 0) *
+        Number(booking.nights || 1)
+    )
+);
+
+foodTotal = Number(
+    booking.foodTotal ?? foodTotal
+);
+
+const calculatedSubtotal =
+    hotelTotal + roomTotal + foodTotal;
+
+const subtotal = Number(
+    booking.subtotal ?? calculatedSubtotal
+);
+
+const discount = Number(
+    booking.couponDiscount ??
+    booking.discount ??
+    booking.discountAmount ??
+    0
+);
+
+const total = Number(
+    booking.finalAmount ??
+    booking.totalAmount ??
+    Math.max(0, subtotal - discount)
+);
+
+
+document.getElementById("hotelTotal").textContent =
+    formatPrice(hotelTotal);
+
+document.getElementById("roomTotal").textContent =
+    formatPrice(roomTotal);
+
+document.getElementById("foodTotal").textContent =
+    formatPrice(foodTotal);
+
+document.getElementById("subtotal").textContent =
+    formatPrice(subtotal);
+
+document.getElementById("coupon").textContent =
+    booking.couponCode || "No Coupon";
+
+document.getElementById("discount").textContent =
+    formatPrice(discount);
+
+document.getElementById("total").textContent =
+    formatPrice(total);
+
+
+// PAYMENT DETAILS
+
+setText(
+    "paymentMethod",
+    booking.paymentMethod
+);
+
+setText(
+    "paymentStatus",
+    booking.paymentStatus
+);
+
+const date = booking.createdAt || booking.bookingDate;
+
+document.getElementById("bookingDate").textContent =
+    date
+        ? new Date(date).toLocaleString("en-IN")
+        : new Date().toLocaleDateString("en-IN");
+
+
+// NAVIGATION
+
+function goToBookings() {
+
+    window.location.href = "my-bookings.html";
+
+}
+
+function goToQR() {
+
+    window.location.href = "qr-pass.html";
+
+}
+
+</script>
+
+</body>
+</html>

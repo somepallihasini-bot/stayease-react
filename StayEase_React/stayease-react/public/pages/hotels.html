@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Explore Hotels - StayEase</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #333;
+}
+
+header {
+    background: #173b67;
+    color: white;
+    padding: 18px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+header h1 { margin: 0; }
+
+nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.hero {
+    text-align: center;
+    padding: 35px 15px;
+    background: #dcecff;
+}
+
+.hero h2 {
+    color: #173b67;
+    font-size: 30px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+}
+
+.filters {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.hotel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 22px;
+}
+
+.hotel-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px #ddd;
+    transition: 0.2s;
+}
+
+.hotel-card:hover {
+    transform: translateY(-4px);
+}
+
+.hotel-card img {
+    width: 100%;
+    height: 190px;
+    object-fit: cover;
+}
+
+.hotel-info { padding: 16px; }
+
+.hotel-info h3 {
+    color: #173b67;
+    margin-top: 0;
+}
+
+.hotel-info p { margin: 9px 0; }
+
+.price {
+    color: #14823b;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.hotel-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.hotel-actions button {
+    width: 50%;
+    color: white;
+    border: none;
+    padding: 12px 5px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.details-btn { background: #173b67; }
+.wishlist-btn { background: #e84363; }
+
+.no-results {
+    text-align: center;
+    padding: 30px;
+    font-size: 18px;
+    display: none;
+}
+
+footer {
+    background: #173b67;
+    color: white;
+    text-align: center;
+    padding: 18px;
+    margin-top: 35px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>StayEase 🏨</h1>
+    <nav>
+        <a href="/">Home</a>
+        <a href="hotels.html">Hotels</a>
+        <a href="my-bookings.html">My Bookings</a>
+        <a href="/wishlist">Wishlist ❤️</a>
+        <a href="profile.html">Profile</a>
+        <a href="/login">Login</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <h2>Explore Hotels</h2>
+    <p>Find your perfect stay with StayEase!</p>
+</section>
+
+<div class="container">
+
+    <div class="filters">
+
+        <input type="text" id="searchInput"
+        placeholder="Search hotel or location..."
+        oninput="filterHotels()">
+
+        <select id="cityFilter" onchange="filterHotels()">
+            <option value="All">All Destinations</option>
+            <option value="Hyderabad">Hyderabad</option>
+            <option value="Bangalore">Bangalore</option>
+            <option value="Goa">Goa</option>
+            <option value="Mumbai">Mumbai</option>
+            <option value="Delhi">Delhi</option>
+        </select>
+
+        <select id="priceFilter" onchange="filterHotels()">
+            <option value="All">All Prices</option>
+            <option value="3000">Below ₹3,000</option>
+            <option value="5000">Below ₹5,000</option>
+            <option value="7000">Below ₹7,000</option>
+        </select>
+
+        <select id="ratingFilter" onchange="filterHotels()">
+            <option value="All">All Ratings</option>
+            <option value="4.5">4.5 and Above</option>
+            <option value="4">4.0 and Above</option>
+            <option value="3">3.0 and Above</option>
+        </select>
+
+    </div>
+
+    <h2>Available Hotels</h2>
+    <p id="hotelCount"></p>
+
+    <div class="hotel-grid" id="hotelContainer"></div>
+
+    <div class="no-results" id="noResults">
+        No hotels found. Try another search.
+    </div>
+
+</div>
+
+<footer>
+    <p>© 2026 StayEase - Smart Hotel Booking Platform</p>
+</footer>
+
+<script>
+
+// DEFAULT HOTELS
+
+const defaultHotels = [
+{
+name:"Taj Grand Hotel",city:"Hyderabad",area:"Banjara Hills",
+price:4500,rating:4.8,
+image:"https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800"
+},
+{
+name:"City Comfort Inn",city:"Hyderabad",area:"Ameerpet",
+price:2500,rating:4.2,
+image:"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800"
+},
+{
+name:"Royal Hyderabad Stay",city:"Hyderabad",area:"Gachibowli",
+price:3500,rating:4.5,
+image:"https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800"
+},
+{
+name:"Pearl Budget Hotel",city:"Hyderabad",area:"Kukatpally",
+price:1800,rating:4.0,
+image:"https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800"
+},
+{
+name:"Grand Palace Hyderabad",city:"Hyderabad",area:"Hitech City",
+price:6000,rating:4.9,
+image:"https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800"
+},
+
+{
+name:"Royal Palace",city:"Bangalore",area:"MG Road",
+price:3500,rating:4.5,
+image:"https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800"
+},
+{
+name:"Budget Stay Bangalore",city:"Bangalore",area:"Electronic City",
+price:2000,rating:4.1,
+image:"https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800"
+},
+{
+name:"Garden View Hotel",city:"Bangalore",area:"Whitefield",
+price:4000,rating:4.6,
+image:"https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800"
+},
+{
+name:"Bangalore Comfort Suites",city:"Bangalore",area:"Indiranagar",
+price:5000,rating:4.7,
+image:"https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800"
+},
+{
+name:"Luxury Crown Hotel",city:"Bangalore",area:"Koramangala",
+price:7000,rating:4.9,
+image:"https://images.unsplash.com/photo-1549294413-26f195200c16?w=800"
+},
+
+{
+name:"Sea View Resort",city:"Goa",area:"Calangute",
+price:6000,rating:4.7,
+image:"https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800"
+},
+{
+name:"Goa Beach Stay",city:"Goa",area:"Baga Beach",
+price:3500,rating:4.4,
+image:"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800"
+},
+{
+name:"Palm Tree Resort",city:"Goa",area:"Candolim",
+price:4500,rating:4.5,
+image:"https://images.unsplash.com/photo-1575429198097-0414ec08e8cd?w=800"
+},
+{
+name:"Sunset Paradise",city:"Goa",area:"Anjuna",
+price:3000,rating:4.3,
+image:"https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800"
+},
+{
+name:"Ocean Luxury Resort",city:"Goa",area:"Vagator",
+price:8000,rating:4.9,
+image:"https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800"
+},
+
+{
+name:"Mumbai Heights",city:"Mumbai",area:"Andheri",
+price:5000,rating:4.6,
+image:"https://images.unsplash.com/photo-1564501049412-61c2a3083791?w=800"
+},
+{
+name:"City Budget Hotel",city:"Mumbai",area:"Dadar",
+price:2500,rating:4.1,
+image:"https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800"
+},
+{
+name:"Marine Drive Hotel",city:"Mumbai",area:"Marine Drive",
+price:6500,rating:4.8,
+image:"https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800"
+},
+{
+name:"Dream City Suites",city:"Mumbai",area:"Bandra",
+price:4000,rating:4.4,
+image:"https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800"
+},
+{
+name:"Grand Mumbai Palace",city:"Mumbai",area:"Colaba",
+price:8500,rating:4.9,
+image:"https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800"
+},
+
+{
+name:"Delhi Grand",city:"Delhi",area:"Connaught Place",
+price:4000,rating:4.4,
+image:"https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800"
+},
+{
+name:"Delhi Comfort Stay",city:"Delhi",area:"Karol Bagh",
+price:2200,rating:4.1,
+image:"https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800"
+},
+{
+name:"Capital View Hotel",city:"Delhi",area:"Aerocity",
+price:5500,rating:4.7,
+image:"https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800"
+},
+{
+name:"Royal Delhi Suites",city:"Delhi",area:"Dwarka",
+price:3500,rating:4.5,
+image:"https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=800"
+},
+{
+name:"Imperial Luxury Hotel",city:"Delhi",area:"Chanakyapuri",
+price:8000,rating:4.9,
+image:"https://images.unsplash.com/photo-1549294413-26f195200c16?w=800"
+}
+];
+
+// ADMIN HOTELS
+
+let adminHotels = [];
+
+try {
+    adminHotels = JSON.parse(
+        localStorage.getItem("adminHotels") || "[]"
+    );
+} catch (error) {
+    adminHotels = [];
+}
+
+let allHotels = [...defaultHotels];
+
+adminHotels.forEach(hotel => {
+    allHotels.push({
+        name: hotel.name || hotel.hotelName || "New Hotel",
+        city: hotel.city || hotel.location || "Other",
+        area: hotel.area || hotel.subLocation || "",
+        price: Number(hotel.price || hotel.hotelPrice || 0),
+        rating: Number(hotel.rating || 4),
+        image: hotel.image || hotel.hotelImage ||
+            defaultHotels[0].image
+    });
+});
+
+// ADD TO WISHLIST
+
+function addToWishlist(hotel) {
+
+    let wishlist = [];
+
+    try {
+        wishlist = JSON.parse(
+            localStorage.getItem("wishlist") || "[]"
+        );
+    } catch (error) {
+        wishlist = [];
+    }
+
+    let exists = wishlist.some(item =>
+        item.name === hotel.name &&
+        item.city === hotel.city
+    );
+
+    if (exists) {
+        alert("Hotel already exists in Wishlist ❤️");
+        return;
+    }
+
+    wishlist.push(hotel);
+
+    localStorage.setItem(
+        "wishlist",
+        JSON.stringify(wishlist)
+    );
+
+    alert("Hotel Added to Wishlist Successfully ❤️");
+}
+
+// VIEW HOTEL DETAILS
+
+function selectHotel(hotel) {
+
+    localStorage.setItem("hotelName", hotel.name);
+    localStorage.setItem("hotelPrice", hotel.price);
+    localStorage.setItem("hotelLocation", hotel.city);
+    localStorage.setItem("hotelSubLocation", hotel.area);
+    localStorage.setItem("hotelImage", hotel.image);
+
+    localStorage.removeItem("roomPrice");
+    localStorage.removeItem("roomType");
+    localStorage.removeItem("selectedRoomImage");
+
+    window.location.href = "hotel-details.html";
+}
+
+// DISPLAY HOTELS
+
+function displayHotels(hotels) {
+
+    const container = document.getElementById("hotelContainer");
+    const noResults = document.getElementById("noResults");
+
+    container.innerHTML = "";
+
+    document.getElementById("hotelCount").innerText =
+        hotels.length + " hotels found";
+
+    if (hotels.length === 0) {
+        noResults.style.display = "block";
+        return;
+    }
+
+    noResults.style.display = "none";
+
+    hotels.forEach(hotel => {
+
+        const card = document.createElement("div");
+        card.className = "hotel-card";
+
+        const image = document.createElement("img");
+        image.src = hotel.image;
+        image.alt = hotel.name;
+
+        image.onerror = function() {
+            this.onerror = null;
+            this.src = defaultHotels[0].image;
+        };
+
+        const info = document.createElement("div");
+        info.className = "hotel-info";
+
+        const title = document.createElement("h3");
+        title.textContent = hotel.name;
+
+        const location = document.createElement("p");
+        location.textContent = "📍 " + hotel.city + " - " + hotel.area;
+
+        const rating = document.createElement("p");
+        rating.textContent = "⭐ " + hotel.rating + " / 5";
+
+        const price = document.createElement("p");
+        price.className = "price";
+        price.textContent =
+            "₹" + hotel.price.toLocaleString("en-IN") + " / night";
+
+        const actions = document.createElement("div");
+        actions.className = "hotel-actions";
+
+        const detailsButton = document.createElement("button");
+        detailsButton.className = "details-btn";
+        detailsButton.textContent = "View Details";
+        detailsButton.onclick = function() {
+            selectHotel(hotel);
+        };
+
+        const wishlistButton = document.createElement("button");
+        wishlistButton.className = "wishlist-btn";
+        wishlistButton.textContent = "❤️ Add to Wishlist";
+        wishlistButton.onclick = function() {
+            addToWishlist(hotel);
+        };
+
+        actions.appendChild(detailsButton);
+        actions.appendChild(wishlistButton);
+
+        info.appendChild(title);
+        info.appendChild(location);
+        info.appendChild(rating);
+        info.appendChild(price);
+        info.appendChild(actions);
+
+        card.appendChild(image);
+        card.appendChild(info);
+
+        container.appendChild(card);
+    });
+}
+
+// SEARCH AND FILTER
+
+function filterHotels() {
+
+    const search = document.getElementById("searchInput")
+        .value.trim().toLowerCase();
+
+    const city = document.getElementById("cityFilter").value;
+    const price = document.getElementById("priceFilter").value;
+    const rating = document.getElementById("ratingFilter").value;
+
+    const filteredHotels = allHotels.filter(hotel => {
+
+        const matchesSearch =
+            hotel.name.toLowerCase().includes(search) ||
+            hotel.city.toLowerCase().includes(search) ||
+            hotel.area.toLowerCase().includes(search);
+
+        const matchesCity =
+            city === "All" ||
+            hotel.city.toLowerCase() === city.toLowerCase();
+
+        const matchesPrice =
+            price === "All" ||
+            hotel.price < Number(price);
+
+        const matchesRating =
+            rating === "All" ||
+            hotel.rating >= Number(rating);
+
+        return matchesSearch && matchesCity &&
+               matchesPrice && matchesRating;
+    });
+
+    displayHotels(filteredHotels);
+}
+
+// HOME PAGE DESTINATION CONNECTION
+
+function applyHomeSearch() {
+
+    const params = new URLSearchParams(window.location.search);
+
+    const urlCity = params.get("destination");
+
+    const savedCity = localStorage.getItem("selectedDestination");
+
+    const destination = urlCity || savedCity || "";
+
+    if (destination) {
+
+        const cityFilter = document.getElementById("cityFilter");
+        const searchInput = document.getElementById("searchInput");
+
+        const matchedCity = [
+            "Hyderabad",
+            "Bangalore",
+            "Goa",
+            "Mumbai",
+            "Delhi"
+        ].find(city =>
+            city.toLowerCase() === destination.trim().toLowerCase()
+        );
+
+        if (matchedCity) {
+            cityFilter.value = matchedCity;
+            searchInput.value = "";
+        } else {
+            cityFilter.value = "All";
+            searchInput.value = destination;
+        }
+
+        // Clear saved destination after applying it
+        localStorage.removeItem("selectedDestination");
+
+    }
+
+    filterHotels();
+}
+
+// INITIAL DISPLAY
+
+applyHomeSearch();
+
+</script>
+
+</body>
+</html>

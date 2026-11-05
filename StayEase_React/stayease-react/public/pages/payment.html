@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StayEase - Payment</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    color: #333;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 15px;
+}
+
+h1 {
+    color: #243b55;
+}
+
+.card {
+    background: white;
+    padding: 22px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.card h2 {
+    color: #243b55;
+    margin-top: 0;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 9px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.food-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.total {
+    font-size: 21px;
+    font-weight: bold;
+    color: #087b45;
+    border-top: 2px solid #ddd;
+    padding-top: 15px;
+}
+
+.food-note {
+    background: #eaf7ef;
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 12px;
+}
+
+.payment-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.payment-options label {
+    padding: 12px 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.payment-options input {
+    margin-right: 7px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 7px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+    gap: 12px;
+}
+
+.pay-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    background: #243b55;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.pay-btn:hover {
+    background: #141e30;
+}
+
+.pay-btn:disabled {
+    background: #777;
+    cursor: not-allowed;
+}
+
+.warning {
+    background: #fff4df;
+    color: #805500;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.message {
+    margin-top: 12px;
+    color: red;
+}
+
+.hidden {
+    display: none;
+}
+
+@media(max-width:600px) {
+    .container {
+        padding: 10px;
+    }
+
+    .card {
+        padding: 15px;
+    }
+
+    .summary-row {
+        font-size: 14px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Complete Your Payment</h1>
+
+<!-- BOOKING SUMMARY -->
+
+<div class="card">
+
+    <h2>Booking Summary</h2>
+
+    <div class="summary-row">
+        <span>Hotel</span>
+        <strong id="hotelName">-</strong>
+    </div>
+
+    <div class="summary-row">
+        <span>Location</span>
+        <strong id="location">-</strong>
+    </div>
+
+    <div class="summary-row">
+        <span>Customer Name</span>
+        <strong id="customerName">-</strong>
+    </div>
+
+    <div class="summary-row">
+        <span>Contact Number</span>
+        <strong id="contactNumber">-</strong>
+    </div>
+
+    <div class="summary-row">
+        <span>Room Type</span>
+        <strong id="roomType">-</strong>
+    </div>
+
+    <div class="summary-row">
+        <span>Room Number</span>
+        <strong id="roomNumber">-</strong>
+    </div>
+
+    <div class="summary-row">
+        <span>Check-in</span>
+        <strong id="checkIn">-</strong>
+    </div>
+
+    <div class="summary-row">
+        <span>Check-out</span>
+        <strong id="checkOut">-</strong>
+    </div>
+
+    <div class="summary-row">
+        <span>Nights</span>
+        <strong id="nights">0</strong>
+    </div>
+
+    <div class="summary-row">
+        <span>Guests</span>
+        <strong id="guests">0</strong>
+    </div>
+
+</div>
+
+
+<!-- FOOD ORDER DETAILS -->
+
+<div class="card">
+
+    <h2>Food Order Details</h2>
+
+    <div id="foodItemsList">
+        No food items selected.
+    </div>
+
+    <div class="food-note">
+        <strong>Delivery: Room Service Only</strong>
+        <p>Food will be delivered to your hotel room.</p>
+    </div>
+
+    <div class="summary-row">
+        <span>Food Charges</span>
+        <strong>₹<span id="foodTotal">0</span></strong>
+    </div>
+
+</div>
+
+
+<!-- PRICE DETAILS -->
+
+<div class="card">
+
+    <h2>Price Details</h2>
+
+    <div class="summary-row">
+        <span>Hotel Amount</span>
+        <strong>₹<span id="hotelAmount">0</span></strong>
+    </div>
+
+    <div class="summary-row">
+        <span>Room Amount</span>
+        <strong>₹<span id="roomAmount">0</span></strong>
+    </div>
+
+    <div class="summary-row">
+        <span>Food Amount</span>
+        <strong>₹<span id="foodAmount">0</span></strong>
+    </div>
+
+    <div class="summary-row">
+        <span>Subtotal</span>
+        <strong>₹<span id="subtotal">0</span></strong>
+    </div>
+
+    <div class="summary-row">
+        <span>Coupon Discount</span>
+        <strong>- ₹<span id="discount">0</span></strong>
+    </div>
+
+    <div class="summary-row total">
+        <span>Final Amount</span>
+        <span>₹<span id="finalAmount">0</span></span>
+    </div>
+
+</div>
+
+
+<!-- PAYMENT METHOD -->
+
+<div class="card">
+
+    <h2>Select Payment Method</h2>
+
+    <div class="warning">
+
+        <strong>Demo Payment:</strong>
+
+        This is a college project demonstration.
+        Do not enter real bank or card details.
+
+    </div>
+
+    <div class="payment-options">
+
+        <label>
+            <input
+                type="radio"
+                name="paymentMethod"
+                value="UPI"
+                onchange="showPaymentFields()">
+
+            UPI
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="paymentMethod"
+                value="Credit/Debit Card"
+                onchange="showPaymentFields()">
+
+            Credit/Debit Card
+        </label>
+
+        <label>
+            <input
+                type="radio"
+                name="paymentMethod"
+                value="Net Banking"
+                onchange="showPaymentFields()">
+
+            Net Banking
+        </label>
+
+    </div>
+
+
+    <!-- UPI -->
+
+    <div id="upiFields" class="hidden">
+
+        <div class="form-group">
+
+            <label>Demo UPI ID</label>
+
+            <input
+                type="text"
+                id="upiId"
+                placeholder="example@upi">
+
+        </div>
+
+    </div>
+
+
+    <!-- CARD -->
+
+    <div id="cardFields" class="hidden">
+
+        <div class="form-group">
+
+            <label>Demo Card Number</label>
+
+            <input
+                type="text"
+                id="cardNumber"
+                maxlength="19"
+                placeholder="1234 5678 9012 3456">
+
+        </div>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Expiry Date</label>
+
+                <input
+                    type="text"
+                    id="expiry"
+                    placeholder="MM/YY"
+                    maxlength="5">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>CVV</label>
+
+                <input
+                    type="password"
+                    id="cvv"
+                    maxlength="3"
+                    placeholder="123">
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- NET BANKING -->
+
+    <div id="bankFields" class="hidden">
+
+        <div class="form-group">
+
+            <label>Select Bank</label>
+
+            <select id="bank">
+
+                <option value="">Select Bank</option>
+
+                <option value="SBI">
+                    State Bank of India
+                </option>
+
+                <option value="HDFC">
+                    HDFC Bank
+                </option>
+
+                <option value="ICICI">
+                    ICICI Bank
+                </option>
+
+                <option value="Axis">
+                    Axis Bank
+                </option>
+
+                <option value="Canara">
+                    Canara Bank
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <p id="paymentMessage" class="message"></p>
+
+    <button
+        class="pay-btn"
+        id="payButton"
+        onclick="makePayment()">
+
+        Pay Now
+
+    </button>
+
+</div>
+
+</div>
+
+
+<script>
+
+// GET BOOKING DETAILS
+
+let bookingDetails = null;
+
+try {
+
+    bookingDetails = JSON.parse(
+        localStorage.getItem("bookingDetails")
+    );
+
+} catch (error) {
+
+    bookingDetails = null;
+
+}
+
+
+// CHECK BOOKING
+
+if (!bookingDetails) {
+
+    alert("Booking details not found. Please book again.");
+
+    window.location.href = "booking.html";
+
+}
+
+
+// FORMAT MONEY
+
+function money(value) {
+
+    return Number(value || 0).toLocaleString("en-IN", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+
+}
+
+
+// SAFE HTML
+
+function escapeHTML(value) {
+
+    return String(value || "").replace(/[&<>"']/g, char => ({
+
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+
+    })[char]);
+
+}
+
+
+// GET FOOD ITEMS
+
+function getBookingFoodItems() {
+
+    return Array.isArray(bookingDetails.foodItems)
+        ? bookingDetails.foodItems
+        : [];
+
+}
+
+
+// GET FOOD TOTAL
+
+function getBookingFoodTotal() {
+
+    return getBookingFoodItems().reduce((sum, item) => {
+
+        const quantity = Number(item.quantity || 0);
+
+        const price = Number(item.price || 0);
+
+        const itemTotal = Number(
+            item.total ?? (price * quantity)
+        );
+
+        return sum + itemTotal;
+
+    }, 0);
+
+}
+
+
+// CALCULATE BOOKING AMOUNTS
+
+function getPriceDetails() {
+
+    const hotelAmount = Number(
+        bookingDetails.hotelAmount || 0
+    );
+
+    const roomAmount = Number(
+        bookingDetails.roomAmount || 0
+    );
+
+    const foodTotal = getBookingFoodTotal();
+
+    const subtotal =
+        hotelAmount + roomAmount + foodTotal;
+
+    const discount = Number(
+        bookingDetails.couponDiscount ??
+        bookingDetails.discount ?? 0
+    );
+
+    const finalAmount = Math.max(
+        0,
+        subtotal - discount
+    );
+
+    return {
+        hotelAmount,
+        roomAmount,
+        foodTotal,
+        subtotal,
+        discount,
+        finalAmount
+    };
+
+}
+
+
+// DISPLAY BOOKING
+
+function displayBooking() {
+
+    const b = bookingDetails;
+
+    const prices = getPriceDetails();
+
+    document.getElementById("hotelName").textContent =
+        b.hotelName || "-";
+
+    document.getElementById("location").textContent =
+        (b.hotelLocation || "") +
+        (b.hotelSubLocation
+            ? ", " + b.hotelSubLocation
+            : "");
+
+    document.getElementById("customerName").textContent =
+        b.customerName || b.userName || "-";
+
+    document.getElementById("contactNumber").textContent =
+        b.contactNumber || "-";
+
+    document.getElementById("roomType").textContent =
+        b.roomType || "-";
+
+    document.getElementById("roomNumber").textContent =
+        b.roomNumber || "-";
+
+    document.getElementById("checkIn").textContent =
+        b.checkIn || b.checkin || "-";
+
+    document.getElementById("checkOut").textContent =
+        b.checkOut || b.checkout || "-";
+
+    document.getElementById("nights").textContent =
+        b.nights || 0;
+
+    document.getElementById("guests").textContent =
+        b.guests || 0;
+
+
+    // FOOD DETAILS
+
+    const foodItems = getBookingFoodItems();
+
+    const foodList = document.getElementById(
+        "foodItemsList"
+    );
+
+    if (foodItems.length > 0) {
+
+        foodList.innerHTML = foodItems.map(item => {
+
+            const itemTotal = Number(
+                item.total ??
+                (Number(item.price || 0) *
+                Number(item.quantity || 0))
+            );
+
+            return `
+                <div class="food-row">
+
+                    <span>
+                        ${escapeHTML(item.name)}
+                        × ${Number(item.quantity || 0)}
+                    </span>
+
+                    <strong>
+                        ₹${money(itemTotal)}
+                    </strong>
+
+                </div>
+            `;
+
+        }).join("");
+
+    } else {
+
+        foodList.textContent =
+            "No food items selected.";
+
+    }
+
+
+    document.getElementById("foodTotal").textContent =
+        money(prices.foodTotal);
+
+    document.getElementById("foodAmount").textContent =
+        money(prices.foodTotal);
+
+
+    // PRICE DETAILS
+
+    document.getElementById("hotelAmount").textContent =
+        money(prices.hotelAmount);
+
+    document.getElementById("roomAmount").textContent =
+        money(prices.roomAmount);
+
+    document.getElementById("subtotal").textContent =
+        money(prices.subtotal);
+
+    document.getElementById("discount").textContent =
+        money(prices.discount);
+
+    document.getElementById("finalAmount").textContent =
+        money(prices.finalAmount);
+
+}
+
+
+// PAYMENT FIELDS
+
+function showPaymentFields() {
+
+    const selected = document.querySelector(
+        'input[name="paymentMethod"]:checked'
+    );
+
+    const method = selected ? selected.value : "";
+
+    document.getElementById("upiFields")
+        .classList.add("hidden");
+
+    document.getElementById("cardFields")
+        .classList.add("hidden");
+
+    document.getElementById("bankFields")
+        .classList.add("hidden");
+
+
+    if (method === "UPI") {
+
+        document.getElementById("upiFields")
+            .classList.remove("hidden");
+
+    }
+
+    else if (method === "Credit/Debit Card") {
+
+        document.getElementById("cardFields")
+            .classList.remove("hidden");
+
+    }
+
+    else if (method === "Net Banking") {
+
+        document.getElementById("bankFields")
+            .classList.remove("hidden");
+
+    }
+
+}
+
+
+// VALIDATE PAYMENT
+
+function validatePayment(method) {
+
+    if (method === "UPI") {
+
+        const upi = document.getElementById(
+            "upiId"
+        ).value.trim();
+
+        if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9]+$/.test(upi)) {
+
+            return "Enter a valid demo UPI ID!";
+
+        }
+
+    }
+
+
+    if (method === "Credit/Debit Card") {
+
+        const card = document.getElementById(
+            "cardNumber"
+        ).value.replace(/\s/g, "");
+
+        const expiry = document.getElementById(
+            "expiry"
+        ).value.trim();
+
+        const cvv = document.getElementById(
+            "cvv"
+        ).value.trim();
+
+
+        if (!/^[0-9]{16}$/.test(card)) {
+
+            return "Enter a valid 16 digit demo card number!";
+
+        }
+
+        if (!/^(0[1-9]|1[0-2])\/[0-9]{2}$/.test(expiry)) {
+
+            return "Enter expiry in MM/YY format!";
+
+        }
+
+        if (!/^[0-9]{3}$/.test(cvv)) {
+
+            return "Enter a valid 3 digit demo CVV!";
+
+        }
+
+    }
+
+
+    if (method === "Net Banking") {
+
+        const bank = document.getElementById(
+            "bank"
+        ).value;
+
+        if (!bank) {
+
+            return "Please select a bank!";
+
+        }
+
+    }
+
+    return "";
+
+}
+
+
+// CHECK ROOM AVAILABILITY
+
+function checkRoomAvailability() {
+
+    const bookings = JSON.parse(
+        localStorage.getItem("bookings") || "[]"
+    );
+
+    const selectedRoom = String(
+        bookingDetails.roomNumber
+    );
+
+    const checkIn =
+        bookingDetails.checkIn ||
+        bookingDetails.checkin;
+
+    const checkOut =
+        bookingDetails.checkOut ||
+        bookingDetails.checkout;
+
+
+    return !bookings.some(old => {
+
+        const status =
+            old.bookingStatus ||
+            old.status ||
+            "";
+
+        if (status.toLowerCase() === "cancelled") {
+
+            return false;
+
+        }
+
+        const oldCheckIn =
+            old.checkIn || old.checkin;
+
+        const oldCheckOut =
+            old.checkOut || old.checkout;
+
+
+        if (!oldCheckIn || !oldCheckOut) {
+
+            return false;
+
+        }
+
+        const sameHotel =
+            old.hotelName === bookingDetails.hotelName;
+
+        const sameRoom =
+            String(old.roomNumber) === selectedRoom;
+
+
+        return sameHotel &&
+            sameRoom &&
+            checkIn < oldCheckOut &&
+            checkOut > oldCheckIn;
+
+    });
+
+}
+
+
+// MAKE PAYMENT
+
+function makePayment() {
+
+    const message = document.getElementById(
+        "paymentMessage"
+    );
+
+    message.style.color = "red";
+
+    message.textContent = "";
+
+
+    // PAYMENT METHOD
+
+    const selected = document.querySelector(
+        'input[name="paymentMethod"]:checked'
+    );
+
+    const method = selected ? selected.value : "";
+
+
+    if (!method) {
+
+        message.textContent =
+            "Please select a payment method!";
+
+        return;
+
+    }
+
+
+    // VALIDATE PAYMENT
+
+    const error = validatePayment(method);
+
+    if (error) {
+
+        message.textContent = error;
+
+        return;
+
+    }
+
+
+    // CHECK ROOM
+
+    if (!checkRoomAvailability()) {
+
+        message.textContent =
+            "Sorry! This room is already booked for these dates.";
+
+        return;
+
+    }
+
+
+    const payButton = document.getElementById(
+        "payButton"
+    );
+
+    payButton.disabled = true;
+
+    payButton.textContent = "Processing...";
+
+
+    try {
+
+        // EXISTING BOOKINGS
+
+        const bookings = JSON.parse(
+            localStorage.getItem("bookings") || "[]"
+        );
+
+
+        // PRICE DETAILS
+
+        const prices = getPriceDetails();
+
+        const foodItems = getBookingFoodItems();
+
+        const foodTotal = prices.foodTotal;
+
+
+        // BOOKING ID
+
+        const bookingId =
+            "SE" + Date.now().toString().slice(-8);
+
+
+        // CONFIRMED BOOKING
+
+        const confirmedBooking = {
+
+            ...bookingDetails,
+
+            bookingId: bookingId,
+
+            hotelAmount: prices.hotelAmount,
+
+            roomAmount: prices.roomAmount,
+
+            foodItems: foodItems,
+
+            foodTotal: foodTotal,
+
+            foodCharge: foodTotal,
+
+            foodIncluded: false,
+
+            meals: [],
+
+            foodDelivery: foodItems.length > 0
+                ? "Room Service"
+                : "Not Ordered",
+
+            diningType: foodItems.length > 0
+                ? "Room Service"
+                : "Not Ordered",
+
+            foodOrderTiming: foodItems.length > 0
+                ? "At Booking"
+                : "Not Ordered",
+
+            subtotal: prices.subtotal,
+
+            couponDiscount: prices.discount,
+
+            discount: prices.discount,
+
+            finalAmount: prices.finalAmount,
+
+            totalAmount: prices.finalAmount,
+
+            paymentMethod: method,
+
+            paymentStatus: "Paid",
+
+            bookingStatus: "Confirmed",
+
+            status: "Confirmed",
+
+            createdAt: new Date().toISOString()
+
+        };
+
+
+        // SAVE BOOKING
+
+        bookings.push(confirmedBooking);
+
+        localStorage.setItem(
+            "bookings",
+            JSON.stringify(bookings)
+        );
+
+
+        // SAVE BOOKING ID
+
+        localStorage.setItem(
+            "bookingId",
+            bookingId
+        );
+
+
+        // SAVE LATEST BOOKING
+
+        localStorage.setItem(
+            "latestBooking",
+            JSON.stringify(confirmedBooking)
+        );
+
+
+        // SAVE FOOD ORDER SEPARATELY
+
+        if (foodItems.length > 0) {
+
+            const foodOrders = JSON.parse(
+                localStorage.getItem("foodOrders") || "[]"
+            );
+
+
+            const foodOrder = {
+
+                orderId: "FOOD" + Date.now(),
+
+                bookingId: bookingId,
+
+                userId: confirmedBooking.userId,
+
+                customerName:
+                    confirmedBooking.customerName,
+
+                contactNumber:
+                    confirmedBooking.contactNumber,
+
+                hotelName:
+                    confirmedBooking.hotelName,
+
+                hotelLocation:
+                    confirmedBooking.hotelLocation,
+
+                roomNumber:
+                    confirmedBooking.roomNumber,
+
+                foodItems: foodItems,
+
+                foodTotal: foodTotal,
+
+                deliveryType: "Room Service",
+
+                orderTiming: "At Booking",
+
+                orderStatus: "Pending",
+
+                createdAt: new Date().toISOString()
+
+            };
+
+
+            foodOrders.push(foodOrder);
+
+            localStorage.setItem(
+                "foodOrders",
+                JSON.stringify(foodOrders)
+            );
+
+        }
+
+
+        // NOTIFICATION
+
+        localStorage.setItem(
+            "notification",
+            "Your booking " + bookingId + " is confirmed!"
+        );
+
+
+        // REMOVE TEMPORARY BOOKING DETAILS
+
+        localStorage.removeItem("bookingDetails");
+
+
+        // SUCCESS MESSAGE
+
+        message.style.color = "green";
+
+        message.textContent =
+            "Payment successful! Booking confirmed.";
+
+
+        payButton.textContent = "Payment Successful";
+
+
+        // GO TO CONFIRMATION PAGE
+
+        setTimeout(() => {
+
+            window.location.href = "confirmation.html";
+
+        }, 1000);
+
+
+    } catch (error) {
+
+        console.error("Payment error:", error);
+
+        message.style.color = "red";
+
+        message.textContent =
+            "Something went wrong. Please try again.";
+
+        payButton.disabled = false;
+
+        payButton.textContent = "Pay Now";
+
+    }
+
+}
+
+
+// INITIALIZE
+
+if (bookingDetails) {
+
+    displayBooking();
+
+}
+
+</script>
+
+</body>
+</html>
